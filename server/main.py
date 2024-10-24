@@ -1,21 +1,17 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
+from routers import user
 import models, schemas, database
 
 app = FastAPI()
 
-def get_db():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+app.include_router(user.router)
 
-@app.on_event("startup")
-def startup():
-    database.init_db()
+database.Base.metadata.create_all(bind=database.engine)
 
-
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 @app.get("/")
 def read_root():
     return {"message": "Hello World!"}
