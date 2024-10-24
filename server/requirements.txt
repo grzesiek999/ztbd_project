@@ -10,6 +10,7 @@ exceptiongroup==1.2.2
 fastapi==0.115.3
 h11==0.14.0
 idna==3.10
+passlib==1.7.4
 psycopg2==2.9.10
 pydantic==2.9.2
 pydantic_core==2.23.4
