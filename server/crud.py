@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 import models, schemas
+from datetime import datetime
 
 
 # User CRUD
@@ -8,11 +9,14 @@ import models, schemas
 def get_user(db: Session, user_id: int):
     return db.query(models.User).filter(models.User.id == user_id).first()
 
-def get_user_by_name(db: Session, name: str):
-    return db.query(models.User).filter(models.User.user_name == name).first()
-
 def get_user_by_email(db: Session, email: str):
     return db.query(models.User).filter(models.User.user_email == email).first()
+
+def get_users_by_name(db: Session, name: str):
+    return db.query(models.User).filter(models.User.user_name == name).first()
+
+def get_users_by_created_at(db: Session, created_at: datetime):
+    pass
 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
