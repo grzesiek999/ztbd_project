@@ -11,6 +11,14 @@ router = APIRouter(
 )
 
 
+@router.get("/get_user_by_id", response_model=schemas.User)
+def get_user_by_id(user_id: int, db: Session = Depends(database.get_db)):
+    return crud.get_user_by_id(db, user_id=user_id)
+
+@router.get("/get_user_by_email", response_model=schemas.User)
+def get_user_by_email(email: str, db: Session = Depends(database.get_db)):
+    return crud.get_user_by_email(db, email=email)
+
 @router.get("/get_users_by_name", response_model=List[schemas.User])
 def get_users_by_name(name: str, db: Session = Depends(database.get_db)):
     return crud.get_users_by_name(db, name=name)
