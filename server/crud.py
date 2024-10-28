@@ -71,13 +71,13 @@ def create_gesture(db: Session, gesture: schemas.GestureCreate):
     db.refresh(db_gesture)
     return db_gesture
 
-def update_gesture(db: Session, gesture: schemas.GestureCreate):
+def update_gesture(db: Session, gesture: schemas.GestureUpdate):
     db_gesture = db.query(models.Gesture).filter(models.Gesture.id == gesture.id).first()
 
     try:
-        if db_gesture.gesture_name:
+        if db_gesture.gesture_name is not None:
             db_gesture.gesture_name = gesture.gesture_name.lower()
-        if db_gesture.description:
+        if db_gesture.description is not None:
             db_gesture.description = gesture.description.lower()
 
         db.commit()
@@ -88,3 +88,6 @@ def update_gesture(db: Session, gesture: schemas.GestureCreate):
         return False
 
     return db_gesture
+
+
+# Device CRUD

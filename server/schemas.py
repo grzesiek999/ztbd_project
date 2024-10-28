@@ -35,6 +35,11 @@ class GestureBase(BaseModel):
 class GestureCreate(GestureBase):
     pass
 
+class GestureUpdate(GestureBase):
+    id: int
+    gesture_name: Optional[str] = None
+    description: Optional[str] = None
+
 class Gesture(GestureBase):
     id: int
 
@@ -51,6 +56,11 @@ class DeviceBase(BaseModel):
 
 class DeviceCreate(DeviceBase):
     user_id: int
+
+class DeviceUpdate(DeviceBase):
+    id: int
+    device_name: Optional[str] = None
+    device_type: Optional[str] = None
 
 class Device(DeviceBase):
     id: int
