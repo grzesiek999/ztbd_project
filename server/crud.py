@@ -31,7 +31,7 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-def path_user(db: Session, user: schemas.UserCreate):
+def update_user(db: Session, user: schemas.UserCreate):
     db_user = db.query(models.User).filter(models.User.user_email == user.user_email).first()
 
     if db_user is None:
