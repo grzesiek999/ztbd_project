@@ -31,19 +31,16 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-def update_user(db: Session, user: schemas.UserCreate):
-    db_user = db.query(models.User).filter(models.User.user_email == user.user_email).first()
-
-    if db_user is None:
-        return False
+def update_user(db: Session, user: schemas.UserUpdate):
+    db_user = db.query(models.User).filter(models.User.id == user.id).first()
 
     try:
-        if user.user_name:
+        if user.user_name is not None:
             db_user.user_name = user.user_name
-        if user.user_email:
+        if user.user_email is not None:
             db_user.user_email = user.user_email.lower()
-        if user.password:
-            db_user.password = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.pasword)
+        if user.password is not None:
+            db_user.password = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password)
 
         db.commit()
         db.refresh(db_user)
@@ -56,3 +53,38 @@ def update_user(db: Session, user: schemas.UserCreate):
 
 
 # Gesture CRUD
+
+def get_gesture_by_id(db: Session, gesture_id: int):
+    return db.query(models.Gesture).filter(models.Gesture.id == gesture_id).first()
+
+def get_gesture_by_name(db: Session, gesture_name: str):
+    return db.query(models.Gesture).filter(models.Gesture.gesture_name == gesture_name).first()
+
+def create_gesture(db: Session, gesture: schemas.GestureCreate):
+    db_gesture = models.Gesture(
+        gesture_name=gesture.gesture_name.lower(),
+        description=gesture.description.lower()
+    )
+
+    db.add(db_gesture)
+    db.commit()
+    db.refresh(db_gesture)
+    return db_gesture
+
+def update_gesture(db: Session, gesture: schemas.GestureCreate):
+    db_gesture = db.query(models.Gesture).filter(models.Gesture.id == gesture.id).first()
+
+    try:
+        if db_gesture.gesture_name:
+            db_gesture.gesture_name = gesture.gesture_name.lower()
+        if db_gesture.description:
+            db_gesture.description = gesture.description.lower()
+
+        db.commit()
+        db.refresh(db_gesture)
+    except Exception as e:
+        db.rollback()
+        print(f"Error: {e}")
+        return False
+
+    return db_gesture

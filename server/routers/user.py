@@ -57,8 +57,8 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)
     return crud.create_user(db=db, user=user)
 
 @router.patch("/update_user", response_model=schemas.User)
-def update_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_user = crud.get_user_by_email(db, email=user.user_email)
+def update_user(user: schemas.UserUpdate, db: Session = Depends(database.get_db)):
+    db_user = crud.get_user_by_id(db, user_id=user.id)
 
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
