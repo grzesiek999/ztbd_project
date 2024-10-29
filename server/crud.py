@@ -57,8 +57,8 @@ def update_user(db: Session, user: schemas.UserUpdate):
 def get_gesture_by_id(db: Session, gesture_id: int):
     return db.query(models.Gesture).filter(models.Gesture.id == gesture_id).first()
 
-def get_gesture_by_name(db: Session, gesture_name: str):
-    return db.query(models.Gesture).filter(models.Gesture.gesture_name == gesture_name).first()
+def get_gestures_by_name(db: Session, gesture_name: str):
+    return db.query(models.Gesture).filter(models.Gesture.gesture_name == gesture_name).all()
 
 def create_gesture(db: Session, gesture: schemas.GestureCreate):
     db_gesture = models.Gesture(
@@ -75,9 +75,9 @@ def update_gesture(db: Session, gesture: schemas.GestureUpdate):
     db_gesture = db.query(models.Gesture).filter(models.Gesture.id == gesture.id).first()
 
     try:
-        if db_gesture.gesture_name is not None:
+        if gesture.gesture_name is not None:
             db_gesture.gesture_name = gesture.gesture_name.lower()
-        if db_gesture.description is not None:
+        if gesture.description is not None:
             db_gesture.description = gesture.description.lower()
 
         db.commit()
