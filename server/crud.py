@@ -148,4 +148,5 @@ def delete_device(db: Session, device_id: int):
     db_device = db.query(models.Device).filter(models.Device.id == device_id).first()
     db.delete(db_device)
     db.commit()
-    return JS
+    return JSONResponse(status_code=200, content={"message": "Device deleted"})
+

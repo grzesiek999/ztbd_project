@@ -14,8 +14,8 @@ class User(Base):
     password = Column(String(255))
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
-    devices = relationship("Device", back_populates="user")
-    user_gestures = relationship("UserGesture", back_populates="user")
+    devices = relationship("Device", back_populates="user", cascade="all, delete-orphan")
+    user_gestures = relationship("UserGesture", back_populates="user", cascade="all, delete-orphan")
 
 
 class Gesture(Base):
@@ -25,7 +25,7 @@ class Gesture(Base):
     gesture_name = Column(String(255), index=True)
     description = Column(Text)
 
-    user_gestures = relationship("UserGesture", back_populates= "gesture")
+    user_gestures = relationship("UserGesture", back_populates= "gesture", cascade="all, delete-orphan")
 
 
 class Device(Base):
@@ -37,7 +37,7 @@ class Device(Base):
     user_id = Column(Integer, ForeignKey("users.id"), index=True)
 
     user = relationship("User", back_populates="devices")
-    user_gestures =relationship("UserGesture", back_populates="device")
+    user_gestures =relationship("UserGesture", back_populates="device", cascade="all, delete-orphan")
 
 
 class UserGesture(Base):
