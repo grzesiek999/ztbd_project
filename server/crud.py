@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from passlib.context import CryptContext
 import models, schemas
@@ -51,6 +52,12 @@ def update_user(db: Session, user: schemas.UserUpdate):
 
     return db_user
 
+def delete_user(db: Session, user_id: int):
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db.delete(db_user)
+    db.commit()
+    return JSONResponse(status_code=200, content={"message": "User deleted"})
+
 
 # Gesture CRUD
 
@@ -89,5 +96,56 @@ def update_gesture(db: Session, gesture: schemas.GestureUpdate):
 
     return db_gesture
 
+def delete_gesture(db: Session, gesture_id: int):
+    db_gesture = db.query(models.Gesture).filter(models.Gesture.id == gesture_id).first()
+    db.delete(db_gesture)
+    db.commit()
+    return JSONResponse(status_code=200, content={"message": "Gesture deleted"})
+
 
 # Device CRUD
+
+def get_device_by_id(db: Session, device_id: int):
+    return db.query(models.Device).filter(models.Device.id == device_id).first()
+
+def get_devices_by_name(db: Session, device_name: str):
+    return db.query(models.Device).filter(models.Device.device_name == device_name).all()
+
+def get_devices_by_type(db: Session, device_type: str):
+    return db.query(models.Device).filter(models.Device.device_type == device_type).all()
+
+def create_device(db: Session, device: schemas.DeviceCreate):
+    db_device = models.Device(
+        device_name =  device.device_name.lower(),
+        device_type = device.device_type.lower(),
+        user_id = device.user_id
+    )
+
+    db.add(db_device)
+    db.commit()
+    db.refresh(db_device)
+    return db_device
+
+def update_device(db: Session, device: schemas.DeviceUpdate):
+    db_device = db.query(models.Device).filter(models.Device.id == device.id).first()
+
+    try:
+        if device.device_name is not None:
+            db_device.device_name = device.device_name.lower()
+        if device.device_type is not None:
+            db_device.device_type = device.device_type.lower()
+
+        db.commit()
+        db.refresh(db_device)
+    except Exception as e:
+        db.rollback()
+        print(f"Error: {e}")
+        return False
+
+    return db_device
+
+def delete_device(db: Session, device_id: int):
+    db_device = db.query(models.Device).filter(models.Device.id == device_id).first()
+    db.delete(db_device)
+    db.commit()
+    return JS

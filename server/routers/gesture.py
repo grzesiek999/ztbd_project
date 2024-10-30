@@ -40,3 +40,12 @@ def update_gesture(gesture: schemas.GestureUpdate, db: Session = Depends(databas
         raise HTTPException(status_code=404, detail="Gesture not found !")
 
     return crud.update_gesture(db, gesture=gesture)
+
+@router.delete("/delete_gesture")
+def delete_gesture(gid: int, db: Session = Depends(database.get_db)):
+    db_gesture = crud.get_gesture_by_id(db, gesture_id=gid)
+
+    if db_gesture is None:
+        raise HTTPException(status_code=404, detail="Gesture not found !")
+
+    return crud.delete_gesture(db, gesture_id=gid)

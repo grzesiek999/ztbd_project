@@ -64,3 +64,12 @@ def update_user(user: schemas.UserUpdate, db: Session = Depends(database.get_db)
         raise HTTPException(status_code=404, detail="User not found")
 
     return crud.update_user(db=db, user=user)
+
+@router.delete("/delete_user")
+def delete_user(uid: int, db: Session = Depends(database.get_db)):
+    db_user = crud.get_user_by_id(db, user_id=uid)
+
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return crud.delete_user(db=db, user_id=uid)
