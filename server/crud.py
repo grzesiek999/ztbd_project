@@ -153,8 +153,8 @@ def delete_device(db: Session, device_id: int):
 
 # UserGesture CRUD
 
-def get_usergesture_by_id(db: Session, uid: int):
-    return db.query(models.UserGesture).filter(models.UserGesture.id == uid).first()
+def get_usergesture_by_id(db: Session, ugid: int):
+    return db.query(models.UserGesture).filter(models.UserGesture.id == ugid).first()
 
 def get_usergestures_by_user_id(db: Session, user_id: int):
     return db.query(models.UserGesture).filter(models.UserGesture.user_id == user_id).all()
