@@ -73,7 +73,6 @@ class Device(DeviceBase):
 
 # UserGesture
 class UserGestureBase(BaseModel):
-    created_at: datetime
     user_id: int
     gesture_id: int
     device_id: int
@@ -83,6 +82,7 @@ class UserGestureCreate(UserGestureBase):
 
 class UserGesture(UserGestureBase):
     id: int
+    created_at: datetime
 
     class Config:
         orm_mode = True

@@ -152,3 +152,32 @@ def delete_device(db: Session, device_id: int):
 
 
 # UserGesture CRUD
+
+def get_usergesture_by_id(db: Session, uid: int):
+    return db.query(models.UserGesture).filter(models.UserGesture.id == uid).first()
+
+def get_usergestures_by_user_id(db: Session, user_id: int):
+    return db.query(models.UserGesture).filter(models.UserGesture.user_id == user_id).all()
+
+def get_usergestures_by_gesture_id(db: Session, gesture_id: int):
+    return db.query(models.UserGesture).filter(models.UserGesture.gesture_id == gesture_id).all()
+
+def get_usergestures_by_device_id(db: Session, device_id: int):
+    return db.query(models.UserGesture).filter(models.UserGesture.device_id == device_id).all()
+
+def create_usergesture(db: Session, usergesture: schemas.UserGestureCreate):
+    db_usergesture = models.UserGesture(
+        user_id=usergesture.user_id,
+        gesture_id=usergesture.gesture_id,
+        device_id=usergesture.device_id
+    )
+    db.add(db_usergesture)
+    db.commit()
+    db.refresh(db_usergesture)
+    return db_usergesture
+
+def delete_usergesture(db: Session, usergesture_id: int):
+    db_usergesture = db.query(models.UserGesture).filter(models.UserGesture.id == usergesture_id).first()
+    db.delete(db_usergesture)
+    db.commit()
+    return JSONResponse(status_code=200, content={"message": "User gesture deleted"})

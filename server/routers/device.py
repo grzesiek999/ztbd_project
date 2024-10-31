@@ -5,7 +5,7 @@ from typing import List
 
 
 router = APIRouter(
-    prefix="/devices",
+    prefix="/device",
     tags=["device"]
 )
 

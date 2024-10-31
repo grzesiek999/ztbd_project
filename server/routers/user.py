@@ -6,8 +6,8 @@ from server import schemas, database, crud
 
 
 router = APIRouter(
-    prefix="/users",
-    tags=["users"],
+    prefix="/user",
+    tags=["user"],
 )
 
 
