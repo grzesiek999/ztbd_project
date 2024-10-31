@@ -150,3 +150,5 @@ def delete_device(db: Session, device_id: int):
     db.commit()
     return JSONResponse(status_code=200, content={"message": "Device deleted"})
 
+
+# UserGesture CRUD
