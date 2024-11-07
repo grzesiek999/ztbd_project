@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
 from server import schemas, database, crud
+import time
 
 
 router = APIRouter(
@@ -13,7 +14,10 @@ router = APIRouter(
 
 @router.get("/get_user_by_id", response_model=schemas.User)
 def get_user_by_id(user_id: int, db: Session = Depends(database.get_db)):
+    start = time.time()
     db_user = crud.get_user_by_id(db, user_id=user_id)
+    end = time.time()
+    print(end - start)
 
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found !")
