@@ -1,7 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
-from routers import basic, user, gesture, device, usergesture
-import models, schemas, database, crud
+from fastapi import FastAPI
+from server.routers.postgresql import device, basic, user, usergesture, gesture
+from server.core import database
 
 app = FastAPI()
 

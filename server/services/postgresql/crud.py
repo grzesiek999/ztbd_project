@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from passlib.context import CryptContext
-import models, schemas
+from server.models.postgresql import models
+from server.schemas.postgresql import schemas
 from datetime import datetime
 
 
