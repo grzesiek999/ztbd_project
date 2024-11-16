@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from server import crud, schemas, database
+from server import crud, database
+from server.schemas.posrgresql import schemas
 from typing import List
 
 
