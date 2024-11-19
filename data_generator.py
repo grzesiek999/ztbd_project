@@ -10,7 +10,7 @@ from bson import ObjectId
 fake = Faker()
 
 # Parametry konfiguracyjne
-USER_COUNT = 10000
+USER_COUNT = 1000
 DEVICE_COUNT_RANGE = (0, 5)
 GESTURE_COUNT_RANGE = (0, 5)
 LOG_COUNT = 20  # Liczba logów dla każdego gestu
@@ -34,35 +34,43 @@ device_types = ["Light", "Appliance", "Camera", "Thermostat"]
 
 
 # Funkcja generująca dane użytkowników
-def generate_users():
+def generate_users_with_devices():
+    devices = []
     users = []
     for _ in range(USER_COUNT):
+        user_id = str(ObjectId())
+        user_devices = generate_devices(user_id)
+        devices.extend(user_devices)
         user = {
             "_id": {
-                "$oid": str(ObjectId()),
+                "$oid": user_id,
             },
             "username": fake.user_name(),
             "email": fake.email(),
             "password_hash": fake.sha256(),
             "created_at": {
-                "$date": fake.date_this_decade().isoformat(),
-            },
-            "devices": generate_devices()  # Generowanie urządzeń dla użytkownika
+                "$date": fake.date_time_this_decade().isoformat(timespec="seconds"),
+            }
         }
         users.append(user)
-    return users
+    return users, devices
 
 
 # Funkcja generująca urządzenia
-def generate_devices():
+def generate_devices(user_id):
     devices = []
     for _ in range(random.randint(*DEVICE_COUNT_RANGE)):  # Liczba urządzeń dla użytkownika
         device_type = random.choice(device_types)
         device = {
-            "device_id": str(ObjectId()),
+            "_id": {
+                "$oid": str(ObjectId())
+            },
             "device_name": fake.word(),
             "device_type": device_type,
-            "device_gestures": generate_device_gestures()  # Gesty przypisane do urządzenia
+            "device_gestures": generate_device_gestures(),  # Gesty przypisane do urządzenia
+            "owner_id": {
+                "$oid": user_id
+            }
         }
         devices.append(device)
     return devices
@@ -83,7 +91,7 @@ def generate_device_gestures():
 
 
 # Funkcja generująca dane do PostgreSQL (CSV)
-def generate_postgres_csv_data(users_data):
+def generate_postgres_csv_data(users_data, devices_data):
     users_csv_data = []
     gestures_csv_data = [[gesture["id"], gesture["gesture_type"], gesture["description"]] for gesture in gestures]
     device_types_csv_data = [[i + 1, device_type] for i, device_type in enumerate(device_types)]
@@ -105,7 +113,9 @@ def generate_postgres_csv_data(users_data):
         users_csv_data.append(
             [user_id, user["username"], user["email"], user["password_hash"], user["created_at"]["$date"]])
 
-        for device in user["devices"]:
+        devices = [device for device in devices_data if device["owner_id"] == user["_id"]]
+
+        for device in devices:
             device_id += 1
             devices_csv_data.append(
                 [device_id, device_types.index(device["device_type"]) + 1, device["device_name"], user_id])
@@ -118,7 +128,7 @@ def generate_postgres_csv_data(users_data):
 
                 # Generowanie logów
                 for _ in range(LOG_COUNT):
-                    data_log = (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat()
+                    data_log = (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat(timespec="seconds")
                     # Generowanie logów do MongoDB
                     log = {
                         "_id": {
@@ -131,7 +141,9 @@ def generate_postgres_csv_data(users_data):
                         "timestamp": {
                             "$date": data_log,
                         },
-                        "device_id": device["device_id"]
+                        "device_id": {
+                            "$oid": device["_id"],
+                        }
                     }
                     gesture_logs_json.append(log)
                     # Generowanie logów do Posgtres'a
@@ -143,15 +155,18 @@ def generate_postgres_csv_data(users_data):
 
 
 # Generowanie danych do MongoDB
-users_data = generate_users()
+users_data, devices_data = generate_users_with_devices()
 
 # Zapis danych do pliku JSON (MongoDB)
 with open(f'{JSON_DIR}users.json', 'w') as f:
     json.dump(users_data, f, indent=4)
 
+with open(f'{JSON_DIR}devices.json', 'w') as f:
+    json.dump(devices_data, f, indent=4)
+
 # Generowanie danych do PostgreSQL i logów do MongoDB
 gesture_logs_json, users_csv_data, gestures_csv_data, device_types_csv_data, devices_csv_data, user_gestures_csv_data, gesture_logs_csv_data = generate_postgres_csv_data(
-    users_data)
+    users_data, devices_data)
 
 # Zapis logów do pliku JSON (MongoDB)
 with open(f'{JSON_DIR}gesture_logs.json', 'w') as f:
