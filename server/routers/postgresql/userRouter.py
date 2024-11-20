@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
-from server.schemas.postgresql import schemas
-from server.services.postgresql import crud
+from server.schemas.postgresql import userSchemas
+from server.services.postgresql import userCrud
 from server.core import database
 import time
 
@@ -14,10 +14,10 @@ router = APIRouter(
 )
 
 
-@router.get("/get_user_by_id", response_model=schemas.User)
+@router.get("/get_user_by_id", response_model=userSchemas.User)
 def get_user_by_id(user_id: int, db: Session = Depends(database.get_db)):
     start = time.time()
-    db_user = crud.get_user_by_id(db, user_id=user_id)
+    db_user = userCrud.get_user_by_id(db, user_id=user_id)
     end = time.time()
     print(end - start)
 
@@ -26,56 +26,56 @@ def get_user_by_id(user_id: int, db: Session = Depends(database.get_db)):
 
     return db_user
 
-@router.get("/get_user_by_email", response_model=schemas.User)
+@router.get("/get_user_by_email", response_model=userSchemas.User)
 def get_user_by_email(email: str, db: Session = Depends(database.get_db)):
-    db_user = crud.get_user_by_email(db, email=email)
+    db_user = userCrud.get_user_by_email(db, email=email)
 
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found !")
 
     return db_user
 
-@router.get("/get_users_by_name", response_model=List[schemas.User])
+@router.get("/get_users_by_name", response_model=List[userSchemas.User])
 def get_users_by_name(name: str, db: Session = Depends(database.get_db)):
-    db_users = crud.get_users_by_name(db, name=name)
+    db_users = userCrud.get_users_by_name(db, name=name)
 
     if db_users is None:
         raise HTTPException(status_code=404, detail="Users not found !")
 
     return db_users
 
-@router.get("/get_users_by_created_at", response_model=List[schemas.User])
+@router.get("/get_users_by_created_at", response_model=List[userSchemas.User])
 def fet_users_by_email(created_at: datetime, db: Session =Depends(database.get_db)):
-    db_users = crud.get_users_by_created_at(db, created_at=created_at)
+    db_users = userCrud.get_users_by_created_at(db, created_at=created_at)
 
     if db_users is None:
         raise HTTPException(status_code=404, detail="Users not found !")
 
     return db_users
 
-@router.post("/create_user", response_model=schemas.User)
-def create_user(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
-    db_user = crud.get_user_by_email(db, email=user.user_email)
+@router.post("/create_user", response_model=userSchemas.User)
+def create_user(user: userSchemas.UserCreate, db: Session = Depends(database.get_db)):
+    db_user = userCrud.get_user_by_email(db, email=user.user_email)
 
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered !")
 
-    return crud.create_user(db=db, user=user)
+    return userCrud.create_user(db=db, user=user)
 
-@router.patch("/update_user", response_model=schemas.User)
-def update_user(user: schemas.UserUpdate, db: Session = Depends(database.get_db)):
-    db_user = crud.get_user_by_id(db, user_id=user.id)
+@router.patch("/update_user", response_model=userSchemas.User)
+def update_user(user: userSchemas.UserUpdate, db: Session = Depends(database.get_db)):
+    db_user = userCrud.get_user_by_id(db, user_id=user.id)
 
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return crud.update_user(db=db, user=user)
+    return userCrud.update_user(db=db, user=user)
 
 @router.delete("/delete_user")
 def delete_user(uid: int, db: Session = Depends(database.get_db)):
-    db_user = crud.get_user_by_id(db, user_id=uid)
+    db_user = userCrud.get_user_by_id(db, user_id=uid)
 
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 
-    return crud.delete_user(db=db, user_id=uid)
+    return userCrud.delete_user(db=db, user_id=uid)

@@ -1,18 +1,18 @@
 from fastapi import FastAPI
-from server.routers.postgresql import device, basic, user, usergesture, gesture
+from server.routers.postgresql import deviceRouter, basicRouter, userRouter, userGestureRouter, gestureRouter
 from server.core import database
 
 app = FastAPI()
 
-app.include_router(basic.router)
+app.include_router(basicRouter.router)
 
-app.include_router(user.router)
+app.include_router(userRouter.router)
 
-app.include_router(gesture.router)
+app.include_router(gestureRouter.router)
 
-app.include_router(device.router)
+app.include_router(deviceRouter.router)
 
-app.include_router(usergesture.router)
+app.include_router(userGestureRouter.router)
 
 
 database.Base.metadata.create_all(bind=database.engine)
