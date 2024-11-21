@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
 from server.schemas.postgresql import userSchemas
-from server.services.postgresql import userCrud
+from server.crud.postgresql import userCrud
 from server.core import database
 import time
 

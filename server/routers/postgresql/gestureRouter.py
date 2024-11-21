@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from server.schemas.postgresql import gestureSchemas
-from server.services.postgresql import gestureCrud
+from server.crud.postgresql import gestureCrud
 from server.core import database
 
 router = APIRouter(
