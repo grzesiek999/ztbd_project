@@ -3,6 +3,8 @@ import random
 import json
 import csv
 from datetime import datetime, timedelta
+from os import device_encoding
+
 from faker import Faker
 from bson import ObjectId
 
@@ -96,7 +98,7 @@ def generate_postgres_csv_data(users_data, devices_data):
     gestures_csv_data = [[gesture["id"], gesture["gesture_type"], gesture["description"]] for gesture in gestures]
     device_types_csv_data = [[i + 1, device_type] for i, device_type in enumerate(device_types)]
     devices_csv_data = []
-    user_gestures_csv_data = []
+    device_gestures_csv_data = []
     gesture_logs_csv_data = []
 
     gesture_logs_json = []
@@ -105,7 +107,7 @@ def generate_postgres_csv_data(users_data, devices_data):
 
     user_id = 0
     device_id = 0
-    user_gestures_id = 0
+    device_gestures_id = 0
     log_id = 0
 
     for user in users_data:
@@ -121,10 +123,10 @@ def generate_postgres_csv_data(users_data, devices_data):
                 [device_id, device_types.index(device["device_type"]) + 1, device["device_name"], user_id])
 
             for gesture in device["device_gestures"]:
-                user_gestures_id += 1
+                device_gestures_id += 1
                 gesture_id = gesture_id_mapping[gesture["gesture_type"]]
-                user_gestures_csv_data.append(
-                    [user_gestures_id, user_id, gesture_id, gesture["gesture_name"], device_id])
+                device_gestures_csv_data.append(
+                    [device_gestures_id, gesture_id, gesture["gesture_name"], device_id])
 
                 # Generowanie logów
                 for _ in range(LOG_COUNT):
@@ -148,10 +150,10 @@ def generate_postgres_csv_data(users_data, devices_data):
                     gesture_logs_json.append(log)
                     # Generowanie logów do Posgtres'a
                     log_id += 1
-                    log = [log_id, user_id, gesture_id, data_log, device_id]
+                    log = [log_id, device_gestures_id, data_log]
                     gesture_logs_csv_data.append(log)
 
-    return gesture_logs_json, users_csv_data, gestures_csv_data, device_types_csv_data, devices_csv_data, user_gestures_csv_data, gesture_logs_csv_data
+    return gesture_logs_json, users_csv_data, gestures_csv_data, device_types_csv_data, devices_csv_data, device_gestures_csv_data, gesture_logs_csv_data
 
 
 # Generowanie danych do MongoDB
@@ -165,7 +167,7 @@ with open(f'{JSON_DIR}devices.json', 'w') as f:
     json.dump(devices_data, f, indent=4)
 
 # Generowanie danych do PostgreSQL i logów do MongoDB
-gesture_logs_json, users_csv_data, gestures_csv_data, device_types_csv_data, devices_csv_data, user_gestures_csv_data, gesture_logs_csv_data = generate_postgres_csv_data(
+gesture_logs_json, users_csv_data, gestures_csv_data, device_types_csv_data, devices_csv_data, device_gestures_csv_data, gesture_logs_csv_data = generate_postgres_csv_data(
     users_data, devices_data)
 
 # Zapis logów do pliku JSON (MongoDB)
@@ -185,6 +187,6 @@ write_csv('users', users_csv_data, ['user_id', 'username', 'email', 'password_ha
 write_csv('gestures', gestures_csv_data, ['gesture_id', 'gesture_type', 'description'])
 write_csv('device_types', device_types_csv_data, ['device_type_id', 'type_name'])
 write_csv('devices', devices_csv_data, ['device_id', 'device_type_id', 'device_name', 'user_id'])
-write_csv('device_gestures', user_gestures_csv_data,
-          ['device_gesture_id', 'user_id', 'gesture_id', 'gesture_name', 'device_id'])
-write_csv('gesture_logs', gesture_logs_csv_data, ['log_id', 'user_id', 'gesture_id', 'timestamp', 'device_id'])
+write_csv('device_gestures', device_gestures_csv_data,
+          ['device_gesture_id', 'gesture_id', 'gesture_name', 'device_id'])
+write_csv('gesture_logs', gesture_logs_csv_data, ['log_id', 'device_gesture_id', 'timestamp'])
