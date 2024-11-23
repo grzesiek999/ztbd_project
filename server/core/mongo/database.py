@@ -1,19 +1,20 @@
-from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
+from pymongo import MongoClient
 import os
 
-# client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
-# db = client.get_database(os.getenv("MONGO_DB_NAME"))
-client: AsyncIOMotorClient = None
+# load_dotenv()
+
+client: MongoClient = None
 db = None
 
 
-async def connect_to_mongo():
+def connect_to_mongo():
     global client, db
-    client = AsyncIOMotorClient(os.getenv("MONGO_URI"))
+    client = MongoClient(os.getenv("MONGO_URI"))
     db = client[str(os.getenv("MONGO_DB_NAME", "gesture_control"))]
 
 
-async def close_mongo_connection():
+def close_mongo_connection():
     client.close()
 
 
