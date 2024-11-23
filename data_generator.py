@@ -223,31 +223,5 @@ def generate_data_and_export(user_count=USER_COUNT, device_types=device_types, g
     export_data(data)
 
 
-generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
-                                device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)
-
-# # Generowanie danych do MongoDB
-# users_data, devices_data = generate_users_with_devices()
-#
-# # Zapis danych do pliku JSON (MongoDB)
-# with open(f'{JSON_DIR}users.json', 'w') as f:
-#     json.dump(users_data, f, indent=4)
-#
-# with open(f'{JSON_DIR}devices.json', 'w') as f:
-#     json.dump(devices_data, f, indent=4)
-#
-# # Generowanie danych do PostgreSQL i logów do MongoDB
-# gesture_logs_json, users_csv_data, gestures_csv_data, device_types_csv_data, devices_csv_data, device_gestures_csv_data, gesture_logs_csv_data = generate_postgres_csv_data(
-#     users_data, devices_data)
-#
-# # Zapis logów do pliku JSON (MongoDB)
-# with open(f'{JSON_DIR}gesture_logs.json', 'w') as f:
-#     json.dump(gesture_logs_json, f, indent=4)
-#
-# write_csv('users', users_csv_data, ['user_id', 'username', 'email', 'password_hash', 'created_at'])
-# write_csv('gestures', gestures_csv_data, ['gesture_id', 'gesture_type', 'description'])
-# write_csv('device_types', device_types_csv_data, ['device_type_id', 'type_name'])
-# write_csv('devices', devices_csv_data, ['device_id', 'device_type_id', 'device_name', 'user_id'])
-# write_csv('device_gestures', device_gestures_csv_data,
-#           ['device_gesture_id', 'gesture_id', 'gesture_name', 'device_id'])
-# write_csv('gesture_logs', gesture_logs_csv_data, ['log_id', 'device_gesture_id', 'timestamp'])
+# generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
+#                                 device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)
