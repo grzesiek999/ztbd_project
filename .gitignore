@@ -1,5 +1,7 @@
 *.idea
 /data/*
+server/data
+/mongo_data
 
 __pycache__/
 *.py[cod]
