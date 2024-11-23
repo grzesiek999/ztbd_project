@@ -190,8 +190,8 @@ def write_json(json_dir, filename, data):
 
 
 def export_data(data):
-    csv_dir = f'{os.getenv("POSTGRES_DATA_DIR")}/'
-    json_dir = f'{os.getenv("MONGO_DATA_DIR")}/'
+    csv_dir = f'../{os.getenv("POSTGRES_DATA_DIR")}/'
+    json_dir = f'../{os.getenv("MONGO_DATA_DIR")}/'
     os.makedirs(json_dir, exist_ok=True)
     os.makedirs(csv_dir, exist_ok=True)
 

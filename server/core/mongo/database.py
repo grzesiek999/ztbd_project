@@ -1,8 +1,5 @@
-from dotenv import load_dotenv
 from pymongo import MongoClient
 import os
-
-# load_dotenv()
 
 client: MongoClient = None
 db = None

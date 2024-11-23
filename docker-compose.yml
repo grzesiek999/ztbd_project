@@ -1,7 +1,7 @@
 services:
   mongo:
     image: mongo:latest
-    container_name: mongo_gesture_devices
+    container_name: ${MONGO_CONTAINER_NAME}
     restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
@@ -10,8 +10,10 @@ services:
       - "27017:27017"
     volumes:
       - ./mongo_data:/data/db
-      - ./server/data/json:/json
+      - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DOCKER_DIR}
 
 volumes:
   mongo_data:
     driver: local
+
+#TODO: Add Postgres service
