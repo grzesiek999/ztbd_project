@@ -7,20 +7,13 @@ from datetime import datetime, timedelta
 from faker import Faker
 from bson import ObjectId
 
-# Inicjalizacja biblioteki Faker
 fake = Faker()
 
-# Parametry konfiguracyjne
 USER_COUNT = 1000
 DEVICE_COUNT_RANGE = (0, 5)
 GESTURE_COUNT_RANGE = (0, 5)
 LOG_COUNT = 20  # Liczba logów dla każdego gestu
 SEED = 42
-CSV_DIR = 'data/csv/'
-JSON_DIR = 'data/json/'
-
-os.makedirs(JSON_DIR, exist_ok=True)
-os.makedirs(CSV_DIR, exist_ok=True)
 
 # Definicja gestów i urządzeń
 gestures = [
@@ -53,7 +46,7 @@ def generate_users_with_devices(user_count, device_types, gestures_list,
             "email": fake.email(),
             "password_hash": fake.sha256(),
             "created_at": {
-                "$date": fake.date_time_this_decade().isoformat(timespec="seconds"),
+                "$date": fake.date_time_this_decade().isoformat(timespec="seconds")+"Z",
             }
         }
         users.append(user)
@@ -97,7 +90,7 @@ def generate_device_gestures(gestures, gesture_count_range=GESTURE_COUNT_RANGE):
 
 
 # Funkcja generująca dane do PostgreSQL (CSV)
-def generate_postgres_csv_data(users_data, devices_data, logs_count=LOG_COUNT):
+def generate_postgres_csv_data(users_data, devices_data, logs_count):
     """ With logs for MongoDB and PostgreSQL"""
     users_csv_data = []
     gestures_csv_data = [[gesture["id"], gesture["gesture_type"], gesture["description"]] for gesture in gestures]
@@ -135,7 +128,7 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count=LOG_COUNT):
 
                 # Generowanie logów
                 for _ in range(logs_count):
-                    data_log = (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat(timespec="seconds")
+                    data_log = (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat(timespec="seconds")+"Z"
                     # Generowanie logów do MongoDB
                     log = {
                         "_id": {
@@ -149,7 +142,7 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count=LOG_COUNT):
                             "$date": data_log,
                         },
                         "device_id": {
-                            "$oid": device["_id"],
+                            "$oid": device["_id"]["$oid"],
                         }
                     }
                     gesture_logs_json.append(log)
@@ -174,32 +167,37 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count=LOG_COUNT):
 
 
 def generate_data(user_count, device_types, gestures_list,
-                                device_count_range, gesture_count_range):
+                                device_count_range, gesture_count_range, log_count):
     users_data_json, devices_data_json = generate_users_with_devices(user_count=user_count, device_types=device_types, gestures_list=gestures_list,
                                 device_count_range=device_count_range, gesture_count_range=gesture_count_range)
-    data = generate_postgres_csv_data(users_data_json, devices_data_json)
+    data = generate_postgres_csv_data(users_data_json, devices_data_json, logs_count=log_count)
 
     data['json']['users'] = users_data_json
     data['json']['devices'] = devices_data_json
     return data
 
 
-def write_csv(filename, data, headers):
-    with open(f'{CSV_DIR}{filename}.csv', 'w', newline='') as f:
+def write_csv(csv_dir, filename, data, headers):
+    with open(f'{csv_dir}{filename}.csv', 'w', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         writer.writerows(data)
 
 
-def write_json(filename, data):
-    with open(os.path.join(JSON_DIR, f'{filename}.json'), 'w') as f:
+def write_json(json_dir, filename, data):
+    with open(os.path.join(json_dir, f'{filename}.json'), 'w') as f:
         json.dump(data, f, indent=4)
 
 
 def export_data(data):
+    csv_dir = f'../{os.getenv("POSTGRES_DATA_DIR")}/'
+    json_dir = f'../{os.getenv("MONGO_DATA_DIR")}/'
+    os.makedirs(json_dir, exist_ok=True)
+    os.makedirs(csv_dir, exist_ok=True)
+
     # Zapis do plików JSON
     for json_filename, json_data in data['json'].items():
-        write_json(json_filename, json_data)
+        write_json(json_dir, json_filename, json_data)
 
     # Nagłówki CSV
     csv_headers = {
@@ -213,13 +211,15 @@ def export_data(data):
 
     # Zapis do plików CSV
     for csv_filename, csv_data in data['csv'].items():
-        write_csv(csv_filename, csv_data, csv_headers[csv_filename])
+        write_csv(csv_dir, csv_filename, csv_data, csv_headers[csv_filename])
 
 
 def generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
-                                device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE):
+                                device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE,
+                                log_count=LOG_COUNT):
     data = generate_data(user_count=user_count, device_types=device_types, gestures_list=gestures_list,
-                                device_count_range=device_count_range, gesture_count_range=gesture_count_range)
+                                device_count_range=device_count_range, gesture_count_range=gesture_count_range,
+                                log_count=log_count)
     export_data(data)
 
 
