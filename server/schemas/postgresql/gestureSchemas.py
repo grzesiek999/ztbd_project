@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from server.schemas.postgresql.userGestureSchemas import UserGesture
+from server.schemas.postgresql.deviceGestureSchemas import DeviceGesture
 
 
 # Gesture
@@ -20,7 +20,7 @@ class GestureUpdate(GestureBase):
 class Gesture(GestureBase):
     id: int
 
-    user_gestures: List["UserGesture"] = []
+    device_gestures: List["DeviceGesture"] = []
 
     class Config:
         orm_mode = True

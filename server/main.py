@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from server.routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, userGestureRouter
+from server.routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, deviceGestureRouter, gestureLogsRouter
 from server.core import database
 from server.routers.mongo import user as mongo_user_router
 from server.routers.mongo import device as mongo_device_router
@@ -20,7 +20,9 @@ app.include_router(gestureRouter.router)
 
 app.include_router(deviceRouter.router)
 
-app.include_router(userGestureRouter.router)
+app.include_router(deviceGestureRouter.router)
+
+app.include_router(gestureLogsRouter.router)
 
 
 

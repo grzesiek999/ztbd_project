@@ -6,14 +6,14 @@ from server.schemas.postgresql import deviceSchemas
 
 # Device CRUD
 
-def get_device_by_id(db: Session, device_id: int):
-    return db.query(deviceModel.Device).filter(deviceModel.Device.id == device_id).first()
+def get_device_by_id(db: Session, did: int):
+    return db.query(deviceModel.Device).filter(deviceModel.Device.id == did).first()
 
-def get_devices_by_name(db: Session, device_name: str):
-    return db.query(deviceModel.Device).filter(deviceModel.Device.device_name == device_name).all()
+def get_devices_by_name(db: Session, name: str):
+    return db.query(deviceModel.Device).filter(deviceModel.Device.device_name == name).all()
 
-def get_devices_by_device_type_id(db: Session, device_type_id: int):
-    return db.query(deviceModel.Device).filter(deviceModel.Device.device_type_id == device_type_id).all()
+def get_devices_by_device_type_id(db: Session, dtid: int):
+    return db.query(deviceModel.Device).filter(deviceModel.Device.device_type_id == dtid).all()
 
 def create_device(db: Session, device: deviceSchemas.DeviceCreate):
     db_device = device.Device(
@@ -45,8 +45,8 @@ def update_device(db: Session, device: deviceSchemas.DeviceUpdate):
 
     return db_device
 
-def delete_device(db: Session, device_id: int):
-    db_device = db.query(deviceModel.Device).filter(deviceModel.Device.id == device_id).first()
+def delete_device(db: Session, did: int):
+    db_device = db.query(deviceModel.Device).filter(deviceModel.Device.id == did).first()
     db.delete(db_device)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "Device deleted"})

@@ -9,9 +9,9 @@ class Device(Base):
     id = Column(Integer, primary_key=True, index=True)
     device_name = Column(String(255), index=True)
     user_id = Column(Integer, ForeignKey("users.id"), index=True)
-    device_type_id = Column(Integer, ForeignKey("device_type.id"), index=True)
+    device_type_id = Column(Integer, ForeignKey("deviceTypes.id"), index=True)
 
 
     user = relationship("User", back_populates="devices")
     device_type = relationship("DeviceType", back_populates="devices")
-    user_gestures =relationship("UserGesture", back_populates="device", cascade="all, delete-orphan")
+    device_gestures =relationship("DeviceGesture", back_populates="device", cascade="all, delete-orphan")

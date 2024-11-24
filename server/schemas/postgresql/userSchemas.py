@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import List, Optional
 from server.schemas.postgresql.deviceSchemas import Device
-from server.schemas.postgresql.userGestureSchemas import UserGesture
 
 
 # User
@@ -24,7 +23,6 @@ class User(UserBase):
     id: int
     created_at: datetime
     devices: List["Device"] = []
-    user_gestures: List["UserGesture"] = []
 
     class Config:
         orm_mode = True

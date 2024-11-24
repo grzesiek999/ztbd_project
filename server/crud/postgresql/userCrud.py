@@ -9,8 +9,8 @@ from datetime import datetime
 
 # User CRUD
 
-def get_user_by_id(db: Session, user_id: int):
-    return db.query(userModel.User).filter(userModel.User.id == user_id).first()
+def get_user_by_id(db: Session, uid: int):
+    return db.query(userModel.User).filter(userModel.User.id == uid).first()
 
 def get_user_by_email(db: Session, email: str):
     return db.query(userModel.User).filter(userModel.User.user_email == email).first()
@@ -34,7 +34,7 @@ def create_user(db: Session, user: userSchemas.UserCreate):
     return db_user
 
 def update_user(db: Session, user: userSchemas.UserUpdate):
-    db_user = db.query(user.User).filter(user.User.id == user.id).first()
+    db_user = db.query(userModel.User).filter(userModel.User.id == user.id).first()
 
     try:
         if user.user_name is not None:
@@ -53,8 +53,8 @@ def update_user(db: Session, user: userSchemas.UserUpdate):
 
     return db_user
 
-def delete_user(db: Session, user_id: int):
-    db_user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
+def delete_user(db: Session, uid: int):
+    db_user = db.query(userModel.User).filter(userModel.User.id == uid).first()
     db.delete(db_user)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "User deleted"})
