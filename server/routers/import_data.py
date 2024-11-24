@@ -23,7 +23,7 @@ def import_data(request: ImportRequest):
     db_name = os.getenv("MONGO_DB_NAME", "gesture_control")
 
     for file in json_files:
-        file_path = f"{os.getenv("MONGO_DATA_DIR")}/{file}"
+        file_path = f"../{os.getenv("MONGO_DATA_DIR")}/{file}"
         if os.path.exists(file_path):
             run_mongoimport_in_docker(f"{os.getenv("MONGO_CONTAINER_NAME")}", mongo_uri, db_name, file)
 

@@ -3,12 +3,12 @@ import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
+from server.routers.import_data import router as import_data_router
+from server.routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, userGestureRouter
 from server.routers.mongo import user as mongo_user_router
 from server.routers.mongo import device as mongo_device_router
 from server.routers.mongo import device_gesture as mongo_device_gesture_router
 from server.routers.mongo import log as mongo_gesture_log_router
-from server.routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, userGestureRouter
-from server.core import database
 from server.core.mongo.database import connect_to_mongo, close_mongo_connection
 
 load_dotenv()
@@ -37,7 +37,7 @@ app.include_router(mongo_user_router.router, prefix="/mongo/users", tags=["users
 app.include_router(mongo_device_router.router, prefix="/mongo/devices", tags=["devices"])
 app.include_router(mongo_device_gesture_router.router, prefix="/mongo/device_gestures", tags=["device_gestures"])
 app.include_router(mongo_gesture_log_router.router, prefix="/mongo/gesture_logs", tags=["gesture_logs"])
-app.include_router(import_data_router.router, tags=["import_data"])
+app.include_router(import_data_router, tags=["import_data"])
 
 # database.Base.metadata.create_all(bind=database.engine)
 
