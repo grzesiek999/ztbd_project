@@ -8,3 +8,5 @@ motor
 pydantic[email]
 bson
 Faker
+pymongo
+python-dotenv
