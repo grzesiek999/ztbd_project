@@ -7,11 +7,11 @@ from server.schemas.postgresql import gestureSchemas
 
 # Gesture CRUD
 
-def get_gesture_by_id(db: Session, gesture_id: int):
-    return db.query(gestureModel.Gesture).filter(gestureModel.Gesture.id == gesture_id).first()
+def get_gesture_by_id(db: Session, gid: int):
+    return db.query(gestureModel.Gesture).filter(gestureModel.Gesture.id == gid).first()
 
-def get_gestures_by_name(db: Session, gesture_name: str):
-    return db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_name == gesture_name).all()
+def get_gesture_by_type(db: Session, type: str):
+    return db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == type).first()
 
 def create_gesture(db: Session, gesture: gestureSchemas.GestureCreate):
     db_gesture = gesture.Gesture(
@@ -25,7 +25,7 @@ def create_gesture(db: Session, gesture: gestureSchemas.GestureCreate):
     return db_gesture
 
 def update_gesture(db: Session, gesture: gestureSchemas.GestureUpdate):
-    db_gesture = db.query(gesture.Gesture).filter(gesture.Gesture.id == gesture.id).first()
+    db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.id == gesture.id).first()
 
     try:
         if gesture.gesture_name is not None:
@@ -42,8 +42,8 @@ def update_gesture(db: Session, gesture: gestureSchemas.GestureUpdate):
 
     return db_gesture
 
-def delete_gesture(db: Session, gesture_id: int):
-    db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.id == gesture_id).first()
+def delete_gesture(db: Session, gid: int):
+    db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.id == gid).first()
     db.delete(db_gesture)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "Gesture deleted"})

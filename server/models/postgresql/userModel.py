@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
-from server.core.database import Base
+from server.core.postgresql.database import Base
 from datetime import datetime, timezone
 
 
@@ -14,4 +14,3 @@ class User(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     devices = relationship("Device", back_populates="user", cascade="all, delete-orphan")
-    user_gestures = relationship("UserGesture", back_populates="user", cascade="all, delete-orphan")

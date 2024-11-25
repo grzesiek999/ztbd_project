@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text
 from sqlalchemy.orm import relationship
-from server.core.database import Base
+from server.core.postgresql.database import Base
 
 
 class Gesture(Base):
@@ -10,4 +10,4 @@ class Gesture(Base):
     gesture_type = Column(String(255), index=True, unique=True)
     description = Column(Text)
 
-    user_gestures = relationship("UserGesture", back_populates= "gesture", cascade="all, delete-orphan")
+    device_gestures = relationship("DeviceGesture", back_populates= "gesture", cascade="all, delete-orphan")

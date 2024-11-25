@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from server.schemas.postgresql import gestureSchemas
 from server.crud.postgresql import gestureCrud
-from server.core import database
+from server.core.postgresql import database
 
 router = APIRouter(
     prefix="/gesture",
@@ -11,42 +11,52 @@ router = APIRouter(
 )
 
 
+
 @router.get("/get_gesture_by_id", response_model=gestureSchemas.Gesture)
 def get_gesture_by_id(gid: int, db: Session = Depends(database.get_db)):
-    db_gesture = gestureCrud.get_gesture_by_id(db, gesture_id=gid)
 
+    db_gesture = gestureCrud.get_gesture_by_id(db, gid)
     if db_gesture is None:
         raise HTTPException(status_code=404, detail="Gesture not found !")
 
     return db_gesture
 
-@router.get("/get_gestures_by_name", response_model=List[gestureSchemas.Gesture])
-def get_gestures_by_name(name: str, db: Session = Depends(database.get_db)):
-    db_gestures = gestureCrud.get_gestures_by_name(db, gesture_name=name)
 
+@router.get("/get_gestures_by_type", response_model=List[gestureSchemas.Gesture])
+def get_gesture_by_type(type: str, db: Session = Depends(database.get_db)):
+
+    db_gestures = gestureCrud.get_gesture_by_type(db, type)
     if db_gestures is None:
         raise HTTPException(status_code=404, detail="Gesture not found !")
 
     return db_gestures
 
+
 @router.post("/create_gesture", response_model=gestureSchemas.Gesture)
 def create_gesture(gesture: gestureSchemas.GestureCreate, db: Session = Depends(database.get_db)):
+
+    db_gesture = gestureCrud.get_gesture_by_type(db, gesture.gesture_type)
+    if db_gesture:
+        raise HTTPException(status_code=409, detail="Gesture already exists")
+
     return gestureCrud.create_gesture(db, gesture=gesture)
+
 
 @router.patch("/update_gesture", response_model=gestureSchemas.Gesture)
 def update_gesture(gesture: gestureSchemas.GestureUpdate, db: Session = Depends(database.get_db)):
-    db_gesture = gestureCrud.get_gesture_by_id(db, gesture_id=gesture.id)
 
+    db_gesture = gestureCrud.get_gesture_by_id(db, gesture.id)
     if db_gesture is None:
         raise HTTPException(status_code=404, detail="Gesture not found !")
 
     return gestureCrud.update_gesture(db, gesture=gesture)
 
+
 @router.delete("/delete_gesture")
 def delete_gesture(gid: int, db: Session = Depends(database.get_db)):
-    db_gesture = gestureCrud.get_gesture_by_id(db, gesture_id=gid)
 
+    db_gesture = gestureCrud.get_gesture_by_id(db, gid)
     if db_gesture is None:
         raise HTTPException(status_code=404, detail="Gesture not found !")
 
-    return gestureCrud.delete_gesture(db, gesture_id=gid)
+    return gestureCrud.delete_gesture(db, gid)

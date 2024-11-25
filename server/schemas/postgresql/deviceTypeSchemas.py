@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from server.models.postgresql.deviceModel import Device
+from server.schemas.postgresql.deviceSchemas import Device
 
 
 class DeviceTypeBase(BaseModel):
