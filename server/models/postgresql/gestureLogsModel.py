@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from server.core.database import Base
+from server.core.postgresql.database import Base
 from datetime import datetime, timezone
 
 

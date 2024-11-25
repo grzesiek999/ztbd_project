@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from server.schemas.postgresql import deviceGestureSchemas
 from server.crud.postgresql import deviceGestureCrud, deviceCrud, gestureCrud
-from server.core import database
+from server.core.postgresql import database
 from typing import List
 
 
@@ -43,7 +43,8 @@ def get_device_gestures_by_device_id(did: int, db: Session = Depends(database.ge
 
 
 @router.post("/create_device_gesture", response_model=deviceGestureSchemas.DeviceGesture)
-def create_device_gesture(deviceGesture: deviceGestureSchemas.DeviceGestureCreate, db: Session = Depends(database.get_db)):
+def create_device_gesture(deviceGesture: deviceGestureSchemas.DeviceGestureCreate, db: Session = Depends(
+    database.get_db)):
     db_gesture = gestureCrud.get_gesture_by_id(db, deviceGesture.gesture_id)
     if db_gesture is None:
         raise HTTPException(status_code=404, detail="Gesture not found !")

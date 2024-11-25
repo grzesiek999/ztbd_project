@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import List
 from server.schemas.postgresql import userSchemas
 from server.crud.postgresql import userCrud
-from server.core import database
+from server.core.postgresql import database
 import time
 
 

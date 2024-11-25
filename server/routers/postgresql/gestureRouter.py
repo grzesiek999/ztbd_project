@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from server.schemas.postgresql import gestureSchemas
 from server.crud.postgresql import gestureCrud
-from server.core import database
+from server.core.postgresql import database
 
 router = APIRouter(
     prefix="/gesture",
