@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
@@ -12,10 +13,10 @@ from server.core.mongo.database import connect_to_mongo, close_mongo_connection
 
 # load_dotenv()
 
-# JSON_DIR = f'{os.getenv("MONGO_DATA_DIR")}/'
-# CSV_DIR = f'{os.getenv("POSTGRES_DATA_DIR")}/'
-# os.makedirs(JSON_DIR, exist_ok=True)
-# os.makedirs(CSV_DIR, exist_ok=True)
+JSON_DIR = f'{os.getenv("MONGO_DATA_DIR")}/'
+CSV_DIR = f'{os.getenv("POSTGRES_DATA_DIR")}/'
+os.makedirs(JSON_DIR, exist_ok=True)
+os.makedirs(CSV_DIR, exist_ok=True)
 
 app = FastAPI()
 
