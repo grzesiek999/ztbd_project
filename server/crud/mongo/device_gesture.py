@@ -1,81 +1,91 @@
 from bson import ObjectId
+from pymongo import UpdateOne
 from pymongo.database import Database
+from typing import List
+
+from server.schemas.mongo.device_gesture import DeviceGestureOut, DeviceIDsAndGesturesCreateRequest, \
+    DeviceIDsAndGesturesUpdateRequest, DeviceIDsAndGesturesDeleteRequest, DeviceGestureUpdate
 
 
-def get_devices_gestures(db: Database):
-    users = db.users.find().to_list(1000)
-    gestures = []
-    for user in users:
-        user_id = str(user["_id"])
-        for device in user.get("devices", []):
-            device_id = str(device["device_id"])
-            for gesture in device.get("device_gestures", []):
-                gestures.append({**gesture, "user_id": user_id, "device_id": device_id})
-    return gestures
+def find_gestures(db: Database, device_ids: List[str]) -> List[DeviceGestureOut]:
+    gestures = db.devices.aggregate([
+        {"$match": {"_id": {"$in": [ObjectId(device_id) for device_id in device_ids]}}},
+        {"$unwind": "$device_gestures"},
+        {"$project": {
+            "gesture_id": "$device_gestures.gesture_id",
+            "gesture_type": "$device_gestures.gesture_type",
+            "gesture_name": "$device_gestures.gesture_name",
+            "gesture_description": "$device_gestures.gesture_description"
+        }}
+    ])
+    return [DeviceGestureOut(**gesture) for gesture in gestures]
 
 
-def get_device_gestures_by_user_id(db: Database, user_id: str):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    gestures = []
-    if user:
-        for device in user.get("devices", []):
-            device_id = str(device["device_id"])
-            for gesture in device.get("gestures", []):
-                gestures.append({**gesture, "device_id": device_id})
-    return gestures
+def find_gestures_by_ids(db: Database, gesture_ids: List[str]) -> List[DeviceGestureOut]:
+    gestures = db.devices.aggregate([
+        {"$unwind": "$device_gestures"},
+        {"$match": {"device_gestures.gesture_id": {"$in": [ObjectId(gesture_id) for gesture_id in gesture_ids]}}},
+        {"$project": {
+            "gesture_id": "$device_gestures.gesture_id",
+            "gesture_type": "$device_gestures.gesture_type",
+            "gesture_name": "$device_gestures.gesture_name",
+            "gesture_description": "$device_gestures.gesture_description"
+        }}
+    ])
+    return [DeviceGestureOut(**gesture) for gesture in gestures]
 
 
-def get_devices_gestures_by_gesture_id(db: Database, gesture_id: str):
-    users = db.users.find().to_list(1000)
-    gestures = []
-    for user in users:
-        user_id = str(user["_id"])
-        for device in user.get("devices", []):
-            device_id = str(device["device_id"])
-            for gesture in device.get("gestures", []):
-                if gesture["gesture_id"] == ObjectId(gesture_id):
-                    gestures.append({**gesture, "user_id": user_id, "device_id": device_id})
-    return gestures
+def insert_gestures(db: Database, gestures_request: List[DeviceIDsAndGesturesCreateRequest]) -> List[DeviceGestureOut]:
+    bulk_operations = []
+    added_gestures = []
+    for request in gestures_request:
+        request = request.model_dump()
+        device_id = request["device_id"]
+        gesture = request["gesture"]
+        gesture["gesture_id"] = str(ObjectId())
+        bulk_operations.append(
+            UpdateOne(
+                {"_id": ObjectId(device_id)},
+                {"$push": {"device_gestures": gesture}}
+            )
+        )
+        added_gestures.append(DeviceGestureOut(**gesture))
+    if bulk_operations:
+        db.devices.bulk_write(bulk_operations)
+    return added_gestures
 
 
-def get_gestures_by_device_id(db: Database, user_id: str, device_id: str):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        for device in user.get("devices", []):
-            if device["device_id"] == ObjectId(device_id):
-                return device.get("gestures", [])
-    return []
+def update_gestures(db: Database, gestures_request: List[DeviceIDsAndGesturesUpdateRequest]) -> List[DeviceGestureUpdate]:
+    bulk_operations = []
+    added_gestures = []
+    for request in gestures_request:
+        request = request.model_dump()
+        device_id = request["device_id"]
+        gesture = request["gesture"]
+        bulk_operations.append(
+            UpdateOne(
+                {"_id": ObjectId(device_id), "device_gestures.gesture_id": gesture["gesture_id"]},
+                {"$set": {"device_gestures.$.gesture_name": gesture["gesture_name"]}}
+            )
+        )
+        added_gestures.append(DeviceGestureUpdate(**gesture))
+    if bulk_operations:
+        db.devices.bulk_write(bulk_operations)
+    return added_gestures
 
 
-def create_device_gesture(db: Database, user_id: str, device_id: str, gesture):
-    gesture["gesture_id"] = ObjectId()
-    db.users.update_one(
-        {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
-        {"$push": {"devices.$.gestures": gesture}}
-    )
-    return gesture
-
-
-def update_device_gesture(db: Database, user_id: str, device_id: str, gesture):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        for device in user.get("devices", []):
-            if device["device_id"] == ObjectId(device_id):
-                gestures = device.get("gestures", [])
-                for i, existing_gesture in enumerate(gestures):
-                    if existing_gesture["gesture_id"] == ObjectId(gesture["gesture_id"]):
-                        gestures[i] = {**existing_gesture, **gesture}
-                        break
-                db.users.update_one(
-                    {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
-                    {"$set": {"devices.$.gestures": gestures}}
-                )
-                return gesture
-    return None
-
-
-def delete_device_gesture(db: Database, user_id: str, device_id: str, gesture_id: str):
-    db.users.update_one(
-        {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
-        {"$pull": {"devices.$.gestures": {"gesture_id": ObjectId(gesture_id)}}}
-    )
+def delete_gestures(db: Database, gestures_request: List[DeviceIDsAndGesturesDeleteRequest]):
+    bulk_operations = []
+    for request in gestures_request:
+        request = request.model_dump()
+        device_id = request["device_id"]
+        gesture_id = request["gesture_id"]
+        bulk_operations.append(
+            UpdateOne(
+                {"_id": ObjectId(device_id)},
+                {"$pull": {"device_gestures": {"gesture_id": gesture_id}}}
+            )
+        )
+    if bulk_operations:
+        db.devices.bulk_write(bulk_operations)
+    return {"message": "Gestures deleted successfully"}

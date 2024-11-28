@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 
@@ -16,10 +16,24 @@ class DeviceGestureCreate(BaseModel):
 
 
 class DeviceGestureUpdate(BaseModel):
-    gesture_type: Optional[str]
+    gesture_id: str
     gesture_name: Optional[str]
-    gesture_description: Optional[str]
 
 
 class DeviceGestureOut(DeviceGestureBase):
     pass
+
+
+class DeviceIDsAndGesturesCreateRequest(BaseModel):
+    device_id: str
+    gesture: DeviceGestureCreate
+
+
+class DeviceIDsAndGesturesUpdateRequest(BaseModel):
+    device_id: str
+    gesture: DeviceGestureUpdate
+
+
+class DeviceIDsAndGesturesDeleteRequest(BaseModel):
+    device_id: str
+    gesture_id: str
