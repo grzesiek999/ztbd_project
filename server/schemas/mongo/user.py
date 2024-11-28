@@ -5,15 +5,12 @@ from typing import List, Optional
 from pydantic import BeforeValidator
 from typing import Annotated
 
-from server.schemas.mongo.device import DeviceBase
-
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class UserBase(BaseModel):
     username: str
     email: EmailStr
-    # devices: List[DeviceBase] = Field(default_factory=list)
 
 
 class UserCreate(UserBase):
@@ -35,7 +32,6 @@ class UserUpdate(BaseModel):
     username: Optional[str]
     email: Optional[EmailStr]
     password_hash: Optional[str]
-    # devices: Optional[List[DeviceBase]] = Field(default_factory=list)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,

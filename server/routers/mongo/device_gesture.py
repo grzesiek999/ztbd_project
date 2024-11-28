@@ -15,7 +15,7 @@ def read_gestures(db: Database = Depends(get_db)):
 
 
 @router.get("/user/{user_id}", response_model=List[DeviceGestureOut])
-def read_user_gestures(user_id: str, db: Database = Depends(get_db)):
+def read_device_gestures(user_id: str, db: Database = Depends(get_db)):
     return crud_device_gesture.get_device_gestures_by_user_id(db, user_id)
 
 

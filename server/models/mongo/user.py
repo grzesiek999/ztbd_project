@@ -11,17 +11,15 @@ class UserGesture(BaseModel):
     gesture_id: str
     gesture_type: str
     gesture_name: str
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True
-    )
+    gesture_description: str
 
 
 class Device(BaseModel):
-    device_id: str
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     device_name: str
     device_type: str
-    user_gestures: Optional[List[UserGesture]] = Field(default_factory=list)
+    device_gestures: Optional[List[UserGesture]] = Field(default_factory=list)
+    owner_id: PyObjectId
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True
@@ -34,7 +32,6 @@ class User(BaseModel):
     email: EmailStr
     password_hash: str
     created_at: datetime
-    # devices: List[Device] = []
 
     model_config = ConfigDict(
         populate_by_name=True,

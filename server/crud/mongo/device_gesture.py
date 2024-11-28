@@ -1,20 +1,20 @@
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.database import Database
 
 
-def get_devices_gestures(db: AsyncIOMotorDatabase):
+def get_devices_gestures(db: Database):
     users = db.users.find().to_list(1000)
     gestures = []
     for user in users:
         user_id = str(user["_id"])
         for device in user.get("devices", []):
             device_id = str(device["device_id"])
-            for gesture in device.get("gestures", []):
+            for gesture in device.get("device_gestures", []):
                 gestures.append({**gesture, "user_id": user_id, "device_id": device_id})
     return gestures
 
 
-def get_device_gestures_by_user_id(db: AsyncIOMotorDatabase, user_id: str):
+def get_device_gestures_by_user_id(db: Database, user_id: str):
     user = db.users.find_one({"_id": ObjectId(user_id)})
     gestures = []
     if user:
@@ -25,7 +25,7 @@ def get_device_gestures_by_user_id(db: AsyncIOMotorDatabase, user_id: str):
     return gestures
 
 
-def get_devices_gestures_by_gesture_id(db: AsyncIOMotorDatabase, gesture_id: str):
+def get_devices_gestures_by_gesture_id(db: Database, gesture_id: str):
     users = db.users.find().to_list(1000)
     gestures = []
     for user in users:
@@ -38,7 +38,7 @@ def get_devices_gestures_by_gesture_id(db: AsyncIOMotorDatabase, gesture_id: str
     return gestures
 
 
-def get_gestures_by_device_id(db: AsyncIOMotorDatabase, user_id: str, device_id: str):
+def get_gestures_by_device_id(db: Database, user_id: str, device_id: str):
     user = db.users.find_one({"_id": ObjectId(user_id)})
     if user:
         for device in user.get("devices", []):
@@ -47,7 +47,7 @@ def get_gestures_by_device_id(db: AsyncIOMotorDatabase, user_id: str, device_id:
     return []
 
 
-def create_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str, gesture):
+def create_device_gesture(db: Database, user_id: str, device_id: str, gesture):
     gesture["gesture_id"] = ObjectId()
     db.users.update_one(
         {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
@@ -56,7 +56,7 @@ def create_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str
     return gesture
 
 
-def update_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str, gesture):
+def update_device_gesture(db: Database, user_id: str, device_id: str, gesture):
     user = db.users.find_one({"_id": ObjectId(user_id)})
     if user:
         for device in user.get("devices", []):
@@ -74,7 +74,7 @@ def update_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str
     return None
 
 
-def delete_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str, gesture_id: str):
+def delete_device_gesture(db: Database, user_id: str, device_id: str, gesture_id: str):
     db.users.update_one(
         {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
         {"$pull": {"devices.$.gestures": {"gesture_id": ObjectId(gesture_id)}}}
