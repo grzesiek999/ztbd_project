@@ -8,7 +8,7 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class UserGesture(BaseModel):
-    gesture_id: str  # uuid.uuid4().hex
+    gesture_id: str
     gesture_type: str
     gesture_name: str
 
@@ -18,10 +18,10 @@ class UserGesture(BaseModel):
 
 
 class Device(BaseModel):
-    device_id: str  # uuid.uuid4().hex
+    device_id: str
     device_name: str
     device_type: str
-    user_gestures: Optional[List[UserGesture]] = []
+    user_gestures: Optional[List[UserGesture]] = Field(default_factory=list)
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True
@@ -34,7 +34,7 @@ class User(BaseModel):
     email: EmailStr
     password_hash: str
     created_at: datetime
-    devices: List[Device] = []
+    # devices: List[Device] = []
 
     model_config = ConfigDict(
         populate_by_name=True,
@@ -44,15 +44,7 @@ class User(BaseModel):
                 "username": "johndoe",
                 "email": "johndoe@example.com",
                 "password_hash": "hashed_password",
-                "created_at": "2024-11-14T00:00:00Z",
-                "devices": [
-                    {
-                        "device_id": "device_id_1",
-                        "device_name": "Device A",
-                        "device_type": "Smartphone",
-                        "user_gestures": [{"gesture_id": "gesture_id_1", "gesture_name": "swipe_up"}]
-                    }
-                ]
+                "created_at": "2024-11-14T00:00:00Z"
             }
         }
     )

@@ -5,13 +5,13 @@ from server.schemas.mongo.device_gesture import DeviceGestureBase
 
 
 # class Gesture(BaseModel):
-#     gesture_id: str  # uuid.uuid4().hex
+#     gesture_id: str
 #     gesture_type: str
 #     gesture_name: str
 
 
 class DeviceBase(BaseModel):
-    device_id: str  # uuid.uuid4().hex
+    device_id: str
     device_type: str
     device_name: str
 

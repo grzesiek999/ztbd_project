@@ -1,45 +1,46 @@
-import datetime
+from datetime import datetime, timezone
 from typing import List
-from bson import ObjectId
+
+from pymongo import UpdateOne
 from pymongo.database import Database
-from passlib.hash import bcrypt
-
-from server.models.mongo.user import User
-from server.schemas.mongo.user import UserCreate, UserUpdate
+from server.schemas.mongo.user import UserCreate, UserUpdate, UserOut
+from bson import ObjectId
 
 
-def get_users(db: Database) -> List[User]:
-    return db.users.find().to_list(1000)
+def find_users(db: Database, user_ids: List[str]) -> List[UserOut]:
+    users = db.users.find({"_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}})
+    return [UserOut(**user) for user in users]
 
 
-def get_user_by_id(db: Database, user_id: str) -> User:
-    return db.users.find_one({"_id": ObjectId(user_id)})
+def insert_users(db: Database, users: List[UserCreate]) -> List[UserOut]:
+    user_dicts = []
+    for user in users:
+        user_data = user.model_dump()
+        user_data["created_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        user_dicts.append(user_data)
+    result = db.users.insert_many(user_dicts)
+    return [UserOut(**user) for user in user_dicts]
 
 
-def get_user_by_email(db: Database, email: str) -> User:
-    return db.users.find_one({"email": email})
+def update_users(db: Database, users: List[UserUpdate]) -> List[UserOut]:
+    bulk_operations = []
+    for user in users:
+        user_id = user.id
+        update_data = user.model_dump(exclude_unset=True, exclude={"id"})
+        bulk_operations.append(
+            UpdateOne(
+                {"_id": ObjectId(user_id)},
+                {"$set": update_data}
+            )
+        )
+
+    if bulk_operations:
+        db.users.bulk_write(bulk_operations)
+
+    updated_user_ids = [user.id for user in users]
+    updated_users = db.users.find({"_id": {"$in": [ObjectId(user_id) for user_id in updated_user_ids]}})
+    return [UserOut(**user) for user in updated_users]
 
 
-def get_users_by_created_at(db: Database, created_at: str) -> List[User]:
-    return db.users.find({"created_at": created_at}).to_list(1000)
-
-
-def create_user(db: Database, user: UserCreate) -> User:
-    user_dict = user.model_dump()
-    user_dict["password"] = bcrypt.using(rounds=13).hash(user.password)
-    user_dict["created_at"] = datetime.datetime.now(datetime.UTC)
-    new_user = db.users.insert_one(user_dict)
-    created_user = db.users.find_one({"_id": new_user.inserted_id})
-    return created_user
-
-
-def update_user(db: Database, user_id: str, user: UserUpdate) -> User:
-    update_data = {k: v for k, v in user.model_dump().items() if v is not None}
-    if "password" in update_data:
-        update_data["password"] = bcrypt.using(rounds=13).hash(update_data["password"])
-    db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update_data})
-    return db.users.find_one({"_id": ObjectId(user_id)})
-
-
-def delete_user(db: Database, user_id: str):
-    db.users.delete_one({"_id": ObjectId(user_id)})
+def delete_users(db: Database, user_ids: List[str]):
+    db.users.delete_many({"_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}})

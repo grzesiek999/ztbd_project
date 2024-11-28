@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class DeviceGestureBase(BaseModel):
-    gesture_id: str  # uuid.uuid4().hex
+    gesture_id: str
     gesture_type: str
     gesture_name: str
     description: str
