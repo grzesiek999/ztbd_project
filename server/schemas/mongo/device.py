@@ -34,15 +34,9 @@ class DeviceCreate(BaseModel):
 
 
 class DeviceUpdate(BaseModel):
-    id: PyObjectId
     device_type: Optional[str] = None
     device_name: Optional[str] = None
     # device_gestures: Optional[List[DeviceGestureBase]] = Field(default_factory=list)
-
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
 
 
 class DeviceOut(DeviceBase):
@@ -55,3 +49,8 @@ class DeviceIDsRequest(BaseModel):
 
 class UserIDsRequest(BaseModel):
     user_ids: List[str]
+
+
+class BulkDeviceUpdate(BaseModel):
+    device_ids: List[str]
+    update_data: DeviceUpdate

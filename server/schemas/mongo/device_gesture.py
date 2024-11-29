@@ -16,8 +16,13 @@ class DeviceGestureCreate(BaseModel):
 
 
 class DeviceGestureUpdate(BaseModel):
-    gesture_id: str
-    gesture_name: Optional[str]
+    gesture_type: str
+    gesture_name: str
+    gesture_description: str
+
+
+class DeviceGestureDeletePattern(BaseModel):
+    gesture_type: Optional[str]
 
 
 class DeviceGestureOut(DeviceGestureBase):
@@ -37,3 +42,18 @@ class DeviceIDsAndGesturesUpdateRequest(BaseModel):
 class DeviceIDsAndGesturesDeleteRequest(BaseModel):
     device_id: str
     gesture_id: str
+
+
+class BulkDeviceGesturesCreate(BaseModel):
+    device_ids: List[str]
+    gesture: DeviceGestureCreate
+
+
+class BulkDeviceGesturesUpdate(BaseModel):
+    device_ids: List[str]
+    gesture: DeviceGestureUpdate
+
+
+class BulkDeviceGesturesDelete(BaseModel):
+    device_ids: List[str]
+    gesture: DeviceGestureDeletePattern

@@ -28,16 +28,15 @@ class UserOut(UserBase):
 
 
 class UserUpdate(BaseModel):
-    id: PyObjectId
     username: Optional[str]
     email: Optional[EmailStr]
     password_hash: Optional[str]
 
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        json_encoders={ObjectId: str}
-    )
-
 
 class UserIDsRequest(BaseModel):
     user_ids: List[str]
+
+
+class BulkUserUpdate(BaseModel):
+    user_ids: List[str]
+    update_data: UserUpdate
