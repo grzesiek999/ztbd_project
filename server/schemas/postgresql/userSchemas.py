@@ -7,20 +7,20 @@ from server.schemas.postgresql.deviceSchemas import Device
 # User
 
 class UserBase(BaseModel):
-    user_name: str
-    user_email: EmailStr
+    username: str
+    email: EmailStr
 
 class UserCreate(UserBase):
-    password: str
+    password_hash: str
 
 class UserUpdate(UserBase):
-    id: int
-    user_name: Optional[str] = None
-    user_email: Optional[EmailStr] = None
-    password: Optional[str] = None
+    user_id: int
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password_hash: Optional[str] = None
 
 class User(UserBase):
-    id: int
+    user_id: int
     created_at: datetime
     devices: List["Device"] = []
 

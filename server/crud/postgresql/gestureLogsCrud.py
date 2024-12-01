@@ -7,5 +7,5 @@ from server.models.postgresql import gestureLogsModel
 # User CRUD
 
 def get_gesture_log_by_id(db: Session, glid: int):
-    return db.query(gestureLogsModel.GestureLogs).filter(gestureLogsModel.GestureLogs.id == glid).first()
+    return db.query(gestureLogsModel.GestureLogs).filter(gestureLogsModel.GestureLogs.log_id == glid).first()
 

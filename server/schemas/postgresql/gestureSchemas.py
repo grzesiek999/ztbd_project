@@ -13,12 +13,12 @@ class GestureCreate(GestureBase):
     pass
 
 class GestureUpdate(GestureBase):
-    id: int
+    gesture_id: int
     gesture_type: Optional[str] = None
     description: Optional[str] = None
 
 class Gesture(GestureBase):
-    id: int
+    gesture_id: int
 
     device_gestures: List["DeviceGesture"] = []
 

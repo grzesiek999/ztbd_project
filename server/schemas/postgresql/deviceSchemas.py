@@ -13,13 +13,13 @@ class DeviceCreate(DeviceBase):
     device_type_id: int
 
 class DeviceUpdate(DeviceBase):
-    id: int
+    device_id: int
     device_name: Optional[str] = None
     user_id: Optional[int] = None
     device_type_id: Optional[int] = None
 
 class Device(DeviceBase):
-    id: int
+    device_id: int
 
     device_gestures: List["DeviceGesture"] = []
 

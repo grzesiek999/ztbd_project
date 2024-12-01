@@ -10,13 +10,13 @@ from datetime import datetime
 # User CRUD
 
 def get_user_by_id(db: Session, uid: int):
-    return db.query(userModel.User).filter(userModel.User.id == uid).first()
+    return db.query(userModel.User).filter(userModel.User.user_id == uid).first()
 
 def get_user_by_email(db: Session, email: str):
-    return db.query(userModel.User).filter(userModel.User.user_email == email).first()
+    return db.query(userModel.User).filter(userModel.User.email == email).first()
 
 def get_users_by_name(db: Session, name: str):
-    return db.query(userModel.User).filter(userModel.User.user_name == name).all()
+    return db.query(userModel.User).filter(userModel.User.username == name).all()
 
 def get_users_by_created_at(db: Session, created_at: datetime):
     target_date = created_at.date()
@@ -24,9 +24,9 @@ def get_users_by_created_at(db: Session, created_at: datetime):
 
 def create_user(db: Session, user: userSchemas.UserCreate):
     db_user = user.User(
-        user_name=user.user_name,
-        user_email=user.user_email.lower(),
-        password=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password)
+        username=user.username,
+        email=user.email.lower(),
+        password_hash=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
     )
     db.add(db_user)
     db.commit()
@@ -34,15 +34,15 @@ def create_user(db: Session, user: userSchemas.UserCreate):
     return db_user
 
 def update_user(db: Session, user: userSchemas.UserUpdate):
-    db_user = db.query(userModel.User).filter(userModel.User.id == user.id).first()
+    db_user = db.query(userModel.User).filter(userModel.User.user_id == user.user_id).first()
 
     try:
-        if user.user_name is not None:
-            db_user.user_name = user.user_name
-        if user.user_email is not None:
-            db_user.user_email = user.user_email.lower()
-        if user.password is not None:
-            db_user.password = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password)
+        if user.username is not None:
+            db_user.username = user.username
+        if user.email is not None:
+            db_user.email = user.email.lower()
+        if user.password_hash is not None:
+            db_user.password_hash = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
 
         db.commit()
         db.refresh(db_user)
@@ -54,7 +54,7 @@ def update_user(db: Session, user: userSchemas.UserUpdate):
     return db_user
 
 def delete_user(db: Session, uid: int):
-    db_user = db.query(userModel.User).filter(userModel.User.id == uid).first()
+    db_user = db.query(userModel.User).filter(userModel.User.user_id == uid).first()
     db.delete(db_user)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "User deleted"})

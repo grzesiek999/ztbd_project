@@ -44,7 +44,7 @@ def create_device_type(deviceType: deviceTypeSchemas.DeviceTypeCreate, db: Sessi
 @router.patch("/update_device_type", response_model=deviceTypeSchemas.DeviceType)
 def update_device_type(deviceType: deviceTypeSchemas.DeviceTypeUpdate, db: Session = Depends(database.get_db)):
 
-    db_device_type = deviceTypeCrud.get_device_type_by_id(db, deviceType.device_id)
+    db_device_type = deviceTypeCrud.get_device_type_by_id(db, deviceType.device_type_id)
     if db_device_type is None:
         raise HTTPException(status_code=404, detail="DeviceType not found !")
 

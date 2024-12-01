@@ -12,12 +12,12 @@ class DeviceTypeCreate(DeviceTypeBase):
 
 
 class DeviceTypeUpdate(DeviceTypeBase):
-    id: int
+    device_type_id: int
     type_name: Optional[str] = None
 
 
 class DeviceType(DeviceTypeBase):
-    id: int
+    device_type_id: int
 
     devices: List["Device"] = []
 
