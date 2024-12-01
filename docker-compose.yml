@@ -12,6 +12,21 @@ services:
       - ./mongo_data:/data/db
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DOCKER_DIR}
 
+  postgres:
+    image: postgres:latest
+    container_name: ${POSTGRES_CONTAINER_NAME}
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+
 volumes:
   mongo_data:
+    driver: local
+  postgres_data:
     driver: local
