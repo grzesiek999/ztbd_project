@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends
 from server.data_generator import generate_data_and_export
 import subprocess
 import os
+from pymongo.database import Database
 
-from server.schemas.mongo.import_data import ImportRequest
+from server.schemas.db_data import ImportRequest
+from server.core.mongo.database import get_db
 
 router = APIRouter()
 
@@ -30,6 +32,23 @@ def import_data(request: ImportRequest):
     # TODO: Import CSV files to Postgres
 
     return {"message": "Data imported successfully"}
+
+
+@router.post("/delete")
+def delete_data(db: Database = Depends(get_db)):
+    try:
+        collections = db.list_collection_names()
+
+        for collection_name in collections:
+            if collection_name != "system.profile":
+                db[collection_name].delete_many({})
+
+        # TODO: Delete data from Postgres
+
+        return {"message": "All data deleted successfully"}
+
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def run_mongoimport_in_docker(mongo_container_name, mongo_uri, db_name, file_path):

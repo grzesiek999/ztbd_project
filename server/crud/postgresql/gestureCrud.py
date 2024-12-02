@@ -16,7 +16,7 @@ def get_gesture_by_type(db: Session, type: str):
 def create_gesture(db: Session, gesture: gestureSchemas.GestureCreate):
     db_gesture = gesture.Gesture(
         gesture_name=gesture.gesture_name.lower(),
-        description=gesture.description.lower()
+        gesture_description=gesture.gesture_description.lower()
     )
 
     db.add(db_gesture)
@@ -30,8 +30,8 @@ def update_gesture(db: Session, gesture: gestureSchemas.GestureUpdate):
     try:
         if gesture.gesture_name is not None:
             db_gesture.gesture_name = gesture.gesture_name.lower()
-        if gesture.description is not None:
-            db_gesture.description = gesture.description.lower()
+        if gesture.gesture_description is not None:
+            db_gesture.gesture_description = gesture.gesture_description.lower()
 
         db.commit()
         db.refresh(db_gesture)

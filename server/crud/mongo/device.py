@@ -1,44 +1,39 @@
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.database import Database
+
+from server.crud.mongo.profiler import get_last_query_time
+from server.schemas.mongo.device import DeviceCreate, BulkDeviceUpdate
+from typing import List
 
 
-def get_devices(db: AsyncIOMotorDatabase):
-    users = db.users.find().to_list(1000)
-    devices = []
-    for user in users:
-        user_devices = user.get("devices", [])
-        for device in user_devices:
-            devices.append({**device, "user_id": str(user["_id"])})
-    return devices
+def find_devices(db: Database, user_ids: List[str]) -> int:
+    list(db.devices.find({"owner_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}},
+                         comment="backend_query"))
+    return get_last_query_time(db)
 
 
-def get_device_by_id(db: AsyncIOMotorDatabase, user_id: str, device_id: str):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        for device in user.get("devices", []):
-            if device["device_id"] == ObjectId(device_id):
-                return device
-    return None
+def insert_devices(db: Database, devices: List[DeviceCreate]) -> int:
+    device_dicts = [device.model_dump(by_alias=True) for device in devices]
+    db.devices.insert_many(device_dicts,
+                           comment="backend_query")
+    return get_last_query_time(db)
 
 
-def create_user_device(db: AsyncIOMotorDatabase, user_id: str, device):
-    device["device_id"] = ObjectId()
-    db.users.update_one({"_id": ObjectId(user_id)}, {"$push": {"devices": device}})
-    return device
+def update_devices(db: Database, devices_update_data: BulkDeviceUpdate) -> int:
+    devices_update_data = devices_update_data.model_dump()
+    device_ids = [ObjectId(device_id) for device_id in devices_update_data["device_ids"]]
+    update_data = devices_update_data["update_data"] if devices_update_data["update_data"] else {}
+
+    if device_ids and update_data:
+        db.devices.update_many(
+            {"_id": {"$in": device_ids}},
+            {"$set": update_data},
+            comment="backend_query"
+        )
+    return get_last_query_time(db)
 
 
-def update_user_device(db: AsyncIOMotorDatabase, user_id: str, device):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        devices = user.get("devices", [])
-        for i, existing_device in enumerate(devices):
-            if existing_device["device_id"] == ObjectId(device["device_id"]):
-                devices[i] = {**existing_device, **device}
-                break
-        db.users.update_one({"_id": ObjectId(user_id)}, {"$set": {"devices": devices}})
-        return device
-    return None
-
-
-def delete_user_device(db: AsyncIOMotorDatabase, user_id: str, device_id: str):
-    db.users.update_one({"_id": ObjectId(user_id)}, {"$pull": {"devices": {"device_id": ObjectId(device_id)}}})
+def delete_devices(db: Database, device_ids: List[str]) -> int:
+    db.devices.delete_many({"_id": {"$in": [ObjectId(device_id) for device_id in device_ids]}},
+                           comment="backend_query")
+    return get_last_query_time(db)
