@@ -1,81 +1,73 @@
 from bson import ObjectId
-from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.database import Database
+from typing import List
+
+from server.crud.mongo.profiler import get_last_query_time
+from server.schemas.mongo.device_gesture import DeviceGestureOut, DeviceGestureUpdate, BulkDeviceGesturesCreate, \
+    DeviceGestureDeletePattern
 
 
-def get_devices_gestures(db: AsyncIOMotorDatabase):
-    users = db.users.find().to_list(1000)
-    gestures = []
-    for user in users:
-        user_id = str(user["_id"])
-        for device in user.get("devices", []):
-            device_id = str(device["device_id"])
-            for gesture in device.get("gestures", []):
-                gestures.append({**gesture, "user_id": user_id, "device_id": device_id})
-    return gestures
+def find_gestures(db: Database, device_ids: List[str]) -> int:
+    list(db.devices.find(
+        {"_id": {"$in": [ObjectId(device_id) for device_id in device_ids]}},
+        {"device_gestures": 1, "_id": 0},
+        comment="backend_query"
+    ))
+    return get_last_query_time(db)
 
 
-def get_device_gestures_by_user_id(db: AsyncIOMotorDatabase, user_id: str):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    gestures = []
-    if user:
-        for device in user.get("devices", []):
-            device_id = str(device["device_id"])
-            for gesture in device.get("gestures", []):
-                gestures.append({**gesture, "device_id": device_id})
-    return gestures
+def find_gestures_by_ids(db: Database, gesture_ids: List[str]) -> List[DeviceGestureOut]:
+    gestures = db.devices.aggregate([
+        {"$unwind": "$device_gestures"},
+        {"$match": {"device_gestures.gesture_id": {"$in": [ObjectId(gesture_id) for gesture_id in gesture_ids]}}},
+        {"$project": {
+            "gesture_id": "$device_gestures.gesture_id",
+            "gesture_type": "$device_gestures.gesture_type",
+            "gesture_name": "$device_gestures.gesture_name",
+            "gesture_description": "$device_gestures.gesture_description"
+        }}
+    ], comment="backend_query")
+    return [DeviceGestureOut(**gesture) for gesture in gestures]
 
 
-def get_devices_gestures_by_gesture_id(db: AsyncIOMotorDatabase, gesture_id: str):
-    users = db.users.find().to_list(1000)
-    gestures = []
-    for user in users:
-        user_id = str(user["_id"])
-        for device in user.get("devices", []):
-            device_id = str(device["device_id"])
-            for gesture in device.get("gestures", []):
-                if gesture["gesture_id"] == ObjectId(gesture_id):
-                    gestures.append({**gesture, "user_id": user_id, "device_id": device_id})
-    return gestures
+def insert_gestures(db: Database, gestures_request: BulkDeviceGesturesCreate) -> int:
+    gesture_data = gestures_request.gesture.model_dump()
+    gesture_data["gesture_id"] = str(ObjectId())
+    device_ids = [ObjectId(device_id) for device_id in gestures_request.device_ids]
+
+    if device_ids and gesture_data:
+        db.devices.update_many(
+            {"_id": {"$in": device_ids}},
+            {"$push": {"device_gestures": gesture_data}},
+            comment="backend_query"
+        )
+    return get_last_query_time(db)
 
 
-def get_gestures_by_device_id(db: AsyncIOMotorDatabase, user_id: str, device_id: str):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        for device in user.get("devices", []):
-            if device["device_id"] == ObjectId(device_id):
-                return device.get("gestures", [])
-    return []
+def update_gestures(db: Database, gesture: DeviceGestureUpdate) -> int:
+    gesture_data = gesture.model_dump()
+
+    if gesture_data:
+        db.devices.update_many(
+            {"device_gestures.gesture_type": gesture_data["gesture_type"]},
+            {
+                "$set": {
+                    "device_gestures.$.gesture_name": gesture_data["gesture_name"],
+                    "device_gestures.$.gesture_description": gesture_data["gesture_description"]
+                }
+            },
+            comment="backend_query"
+        )
+    return get_last_query_time(db)
 
 
-def create_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str, gesture):
-    gesture["gesture_id"] = ObjectId()
-    db.users.update_one(
-        {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
-        {"$push": {"devices.$.gestures": gesture}}
-    )
-    return gesture
+def delete_gestures(db: Database, gesture: DeviceGestureDeletePattern) -> int:
+    gesture_criteria = gesture.model_dump(exclude_unset=True)
 
-
-def update_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str, gesture):
-    user = db.users.find_one({"_id": ObjectId(user_id)})
-    if user:
-        for device in user.get("devices", []):
-            if device["device_id"] == ObjectId(device_id):
-                gestures = device.get("gestures", [])
-                for i, existing_gesture in enumerate(gestures):
-                    if existing_gesture["gesture_id"] == ObjectId(gesture["gesture_id"]):
-                        gestures[i] = {**existing_gesture, **gesture}
-                        break
-                db.users.update_one(
-                    {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
-                    {"$set": {"devices.$.gestures": gestures}}
-                )
-                return gesture
-    return None
-
-
-def delete_device_gesture(db: AsyncIOMotorDatabase, user_id: str, device_id: str, gesture_id: str):
-    db.users.update_one(
-        {"_id": ObjectId(user_id), "devices.device_id": ObjectId(device_id)},
-        {"$pull": {"devices.$.gestures": {"gesture_id": ObjectId(gesture_id)}}}
-    )
+    if gesture_criteria:
+        db.devices.update_many(
+            {"device_gestures.gesture_type": gesture_criteria.get("gesture_type")},
+            {"$pull": {"device_gestures": {"gesture_type": gesture_criteria.get("gesture_type")}}},
+            comment="backend_query"
+        )
+    return get_last_query_time(db)
