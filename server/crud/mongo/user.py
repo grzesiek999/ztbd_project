@@ -1,45 +1,46 @@
-import datetime
+from datetime import datetime, timezone
 from typing import List
-from bson import ObjectId
+
 from pymongo.database import Database
-from passlib.hash import bcrypt
 
-from server.models.mongo.user import User
-from server.schemas.mongo.user import UserCreate, UserUpdate
-
-
-def get_users(db: Database) -> List[User]:
-    return db.users.find().to_list(1000)
+from server.crud.mongo.profiler import get_last_query_time
+from server.schemas.mongo.user import UserCreate, BulkUserUpdate
+from bson import ObjectId
 
 
-def get_user_by_id(db: Database, user_id: str) -> User:
-    return db.users.find_one({"_id": ObjectId(user_id)})
+def find_users(db: Database, user_ids: List[str]) -> int:
+    list(db.users.find({"_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}},
+                       comment="backend_query"))
+    return get_last_query_time(db)
 
 
-def get_user_by_email(db: Database, email: str) -> User:
-    return db.users.find_one({"email": email})
+def insert_users(db: Database, users: List[UserCreate]) -> int:
+    user_dicts = []
+    for user in users:
+        user_data = user.model_dump()
+        user_data["created_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        user_dicts.append(user_data)
+    db.users.insert_many(user_dicts,
+                         comment="backend_query")
+    return get_last_query_time(db)
 
 
-def get_users_by_created_at(db: Database, created_at: str) -> List[User]:
-    return db.users.find({"created_at": created_at}).to_list(1000)
+def update_users(db: Database, users_update_data: BulkUserUpdate) -> int:
+    users_update_data = users_update_data.model_dump()
+    user_ids = [ObjectId(user_id) for user_id in users_update_data["user_ids"]]
+    update_data = users_update_data["update_data"] if users_update_data[
+        "update_data"] else {}
+
+    if user_ids and update_data:
+        db.users.update_many(
+            {"_id": {"$in": user_ids}},
+            {"$set": update_data},
+            comment="backend_query"
+        )
+    return get_last_query_time(db)
 
 
-def create_user(db: Database, user: UserCreate) -> User:
-    user_dict = user.model_dump()
-    user_dict["password"] = bcrypt.using(rounds=13).hash(user.password)
-    user_dict["created_at"] = datetime.datetime.now(datetime.UTC)
-    new_user = db.users.insert_one(user_dict)
-    created_user = db.users.find_one({"_id": new_user.inserted_id})
-    return created_user
-
-
-def update_user(db: Database, user_id: str, user: UserUpdate) -> User:
-    update_data = {k: v for k, v in user.model_dump().items() if v is not None}
-    if "password" in update_data:
-        update_data["password"] = bcrypt.using(rounds=13).hash(update_data["password"])
-    db.users.update_one({"_id": ObjectId(user_id)}, {"$set": update_data})
-    return db.users.find_one({"_id": ObjectId(user_id)})
-
-
-def delete_user(db: Database, user_id: str):
-    db.users.delete_one({"_id": ObjectId(user_id)})
+def delete_users(db: Database, user_ids: List[str]) -> int:
+    db.users.delete_many({"_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}},
+                         comment="backend_query")
+    return get_last_query_time(db)
