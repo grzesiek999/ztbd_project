@@ -50,8 +50,8 @@ def create_device(device: deviceSchemas.DeviceCreate, db: Session = Depends(data
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found !")
 
-    db_device_type_id = deviceTypeCrud.get_device_type_by_id(db, device.device_type_id)
-    if db_device_type_id is None:
+    db_device_type = deviceTypeCrud.get_device_type_by_id(db, device.device_type_id)
+    if db_device_type is None:
         raise HTTPException(status_code=404, detail="DeviceType not found !")
 
     return deviceCrud.create_device(db, device=device)
@@ -60,7 +60,7 @@ def create_device(device: deviceSchemas.DeviceCreate, db: Session = Depends(data
 @router.patch("/update_device", response_model=deviceSchemas.Device)
 def update_device(device: deviceSchemas.DeviceUpdate, db: Session = Depends(database.get_db)):
 
-    db_device = deviceCrud.get_device_by_id(db, device.id)
+    db_device = deviceCrud.get_device_by_id(db, device.device_id)
     if db_device is None:
         raise HTTPException(status_code=404, detail="Device not found !")
 

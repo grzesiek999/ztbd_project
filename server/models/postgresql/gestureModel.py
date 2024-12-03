@@ -6,7 +6,7 @@ from server.core.postgresql.database import Base
 class Gesture(Base):
     __tablename__ = "gestures"
 
-    id = Column(Integer, primary_key=True, index=True)
+    gesture_id = Column(Integer, primary_key=True, index=True)
     gesture_type = Column(String(255), index=True, unique=True)
     description = Column(Text)
 

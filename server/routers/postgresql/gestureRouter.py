@@ -45,7 +45,7 @@ def create_gesture(gesture: gestureSchemas.GestureCreate, db: Session = Depends(
 @router.patch("/update_gesture", response_model=gestureSchemas.Gesture)
 def update_gesture(gesture: gestureSchemas.GestureUpdate, db: Session = Depends(database.get_db)):
 
-    db_gesture = gestureCrud.get_gesture_by_id(db, gesture.id)
+    db_gesture = gestureCrud.get_gesture_by_id(db, gesture.gesture_id)
     if db_gesture is None:
         raise HTTPException(status_code=404, detail="Gesture not found !")
 

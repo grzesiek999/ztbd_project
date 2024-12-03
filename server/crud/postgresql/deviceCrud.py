@@ -7,7 +7,7 @@ from server.schemas.postgresql import deviceSchemas
 # Device CRUD
 
 def get_device_by_id(db: Session, did: int):
-    return db.query(deviceModel.Device).filter(deviceModel.Device.id == did).first()
+    return db.query(deviceModel.Device).filter(deviceModel.Device.device_id == did).first()
 
 def get_devices_by_name(db: Session, name: str):
     return db.query(deviceModel.Device).filter(deviceModel.Device.device_name == name).all()
@@ -28,7 +28,7 @@ def create_device(db: Session, device: deviceSchemas.DeviceCreate):
     return db_device
 
 def update_device(db: Session, device: deviceSchemas.DeviceUpdate):
-    db_device = db.query(deviceModel.Device).filter(deviceModel.Device.id == device.id).first()
+    db_device = db.query(deviceModel.Device).filter(deviceModel.Device.device_id == device.device_id).first()
 
     try:
         if device.device_name is not None:
@@ -46,7 +46,7 @@ def update_device(db: Session, device: deviceSchemas.DeviceUpdate):
     return db_device
 
 def delete_device(db: Session, did: int):
-    db_device = db.query(deviceModel.Device).filter(deviceModel.Device.id == did).first()
+    db_device = db.query(deviceModel.Device).filter(deviceModel.Device.device_id == did).first()
     db.delete(db_device)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "Device deleted"})

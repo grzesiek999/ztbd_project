@@ -62,7 +62,7 @@ def fet_users_by_email(created_at: datetime, db: Session =Depends(database.get_d
 @router.post("/create_user", response_model=userSchemas.User)
 def create_user(user: userSchemas.UserCreate, db: Session = Depends(database.get_db)):
 
-    db_user = userCrud.get_user_by_email(db, email=user.user_email)
+    db_user = userCrud.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered !")
 
@@ -72,7 +72,7 @@ def create_user(user: userSchemas.UserCreate, db: Session = Depends(database.get
 @router.patch("/update_user", response_model=userSchemas.User)
 def update_user(user: userSchemas.UserUpdate, db: Session = Depends(database.get_db)):
 
-    db_user = userCrud.get_user_by_id(db, user.id)
+    db_user = userCrud.get_user_by_id(db, user.user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
 

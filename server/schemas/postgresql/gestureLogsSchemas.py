@@ -12,9 +12,9 @@ class GestureLogsCreate(GestureLogsBase):
 
 
 class GestureLogs(GestureLogsBase):
-    id: int
-    created_at: datetime
+    log_id: int
+    timestamp: datetime
 
 
     class Config:
-        orm_mode = True
+        from_attributes = True

@@ -14,10 +14,10 @@ class DeviceGestureCreate(DeviceGestureBase):
     pass
 
 class DeviceGesture(DeviceGestureBase):
-    id: int
+    device_gesture_id: int
     gesture_name: str
 
     gesture_logs: List["GestureLogs"] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
