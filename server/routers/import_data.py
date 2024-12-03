@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from server.data_generator import generate_data_and_export
 import subprocess
 import os
 
-from server.schemas.mongo.import_data import ImportRequest
+from server.schemas.import_data import ImportRequest
 
 router = APIRouter()
 

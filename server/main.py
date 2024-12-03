@@ -40,7 +40,7 @@ app.include_router(mongo_user_router.router, prefix="/mongo/users", tags=["users
 app.include_router(mongo_device_router.router, prefix="/mongo/devices", tags=["devices"])
 app.include_router(mongo_device_gesture_router.router, prefix="/mongo/device_gestures", tags=["device_gestures"])
 app.include_router(mongo_gesture_log_router.router, prefix="/mongo/gesture_logs", tags=["gesture_logs"])
-app.include_router(import_data_router, tags=["import_data"])
+app.include_router(import_data_router, prefix="/db", tags=["import_data"])
 
 database.Base.metadata.create_all(bind=database.engine)
 
