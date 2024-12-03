@@ -9,12 +9,12 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class UserBase(BaseModel):
-    username: str
-    email: EmailStr
+    username: str = Field(..., examples=["Foo"])
+    email: EmailStr = Field(..., examples=["johndoe@example.com"])
 
 
 class UserCreate(UserBase):
-    password_hash: str
+    password_hash: str = Field(..., examples=["hashedpassword123"])
 
 
 class UserOut(UserBase):
@@ -28,15 +28,15 @@ class UserOut(UserBase):
 
 
 class UserUpdate(BaseModel):
-    username: Optional[str]
-    email: Optional[EmailStr]
-    password_hash: Optional[str]
+    username: Optional[str] = Field(..., examples=["Foo"])
+    email: Optional[EmailStr] = Field(..., examples=["johndoe@example.com"])
+    password_hash: Optional[str] = Field(..., examples=["hashedpassword123"])
 
 
 class UserIDsRequest(BaseModel):
-    user_ids: List[str]
+    user_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
 
 
 class BulkUserUpdate(BaseModel):
-    user_ids: List[str]
+    user_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
     update_data: UserUpdate

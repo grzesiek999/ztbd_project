@@ -2,6 +2,7 @@ import os
 import random
 import json
 import csv
+import uuid
 from datetime import datetime, timedelta
 
 from faker import Faker
@@ -32,6 +33,13 @@ def generate_users_with_devices(user_count, device_types, gestures_list,
                                 device_count_range, gesture_count_range):
     devices = []
     users = []
+
+    def generate_unique_email():
+        email_prefix = fake.user_name() + str(uuid.uuid4())
+        email_domain = fake.free_email_domain()
+        email = f"{email_prefix}@{email_domain}"
+        return email
+
     for _ in range(user_count):
         user_id = str(ObjectId())
         user_devices = generate_devices_with_gestures(user_id, device_types=device_types, gestures_list=gestures_list,
@@ -43,7 +51,7 @@ def generate_users_with_devices(user_count, device_types, gestures_list,
                 "$oid": user_id,
             },
             "username": fake.user_name(),
-            "email": fake.email(),
+            "email": generate_unique_email(),
             "password_hash": fake.sha256(),
             "created_at": {
                 "$date": fake.date_time_this_decade().isoformat(timespec="seconds")+"Z",
