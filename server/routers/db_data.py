@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 from server.data_generator import generate_data_and_export
 import subprocess
 import os
@@ -6,6 +7,15 @@ from pymongo.database import Database
 
 from server.schemas.db_data import ImportRequest
 from server.core.mongo.database import get_db
+from server.core.postgresql.utils import (
+    import_users,
+    import_device_types,
+    import_gestures,
+    import_devices,
+    import_device_gestures,
+    import_gesture_logs
+)
+from server.core.postgresql import database
 
 router = APIRouter()
 
@@ -25,11 +35,11 @@ def import_data(request: ImportRequest):
     db_name = os.getenv("MONGO_DB_NAME", "gesture_control")
 
     for file in json_files:
-        file_path = f"../{os.getenv("MONGO_DATA_DIR")}/{file}"
+        file_path = f'../{os.getenv("MONGO_DATA_DIR")}/{file}'
         if os.path.exists(file_path):
-            run_mongoimport_in_docker(f"{os.getenv("MONGO_CONTAINER_NAME")}", mongo_uri, db_name, file)
+            run_mongoimport_in_docker(f'{os.getenv("MONGO_CONTAINER_NAME")}', mongo_uri, db_name, file)
 
-    # TODO: Import CSV files to Postgres
+    run_postgre_import(database.get_db())
 
     return {"message": "Data imported successfully"}
 
@@ -59,7 +69,7 @@ def run_mongoimport_in_docker(mongo_container_name, mongo_uri, db_name, file_pat
         "--uri", mongo_uri,
         "--db", db_name,
         "--collection", file_path.split('.')[0],
-        "--file", f"/{os.getenv("MONGO_DATA_DOCKER_DIR")}/{file_path}",  # Plik JSON w kontenerze
+        "--file", f'/{os.getenv("MONGO_DATA_DOCKER_DIR")}/{file_path}',  # Plik JSON w kontenerze
         "--jsonArray",
         "--drop"
     ]
@@ -69,3 +79,12 @@ def run_mongoimport_in_docker(mongo_container_name, mongo_uri, db_name, file_pat
         print(f"Plik {file_path} zaimportowany pomyślnie!")
     except subprocess.CalledProcessError as e:
         print(f"Błąd podczas importowania pliku {file_path}: {e}")
+
+
+def run_postgre_import(db: Session = Depends(database.get_db)):
+    import_users(db)
+    import_device_types(db)
+    import_gestures(db)
+    import_devices(db)
+    import_device_gestures(db)
+    import_gesture_logs(db)

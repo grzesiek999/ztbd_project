@@ -25,4 +25,4 @@ class User(UserBase):
     devices: List["Device"] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

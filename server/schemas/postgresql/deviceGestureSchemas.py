@@ -20,4 +20,4 @@ class DeviceGesture(DeviceGestureBase):
     gesture_logs: List["GestureLogs"] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True

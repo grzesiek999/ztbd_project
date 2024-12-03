@@ -24,4 +24,4 @@ class Device(DeviceBase):
     device_gestures: List["DeviceGesture"] = []
 
     class Config:
-        orm_mode = True
+        from_attributes = True
