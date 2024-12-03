@@ -21,7 +21,7 @@
     ```
     c) Set profiler:<br>
     ```
-    db.auth("root", "password")
+    db.auth("[username]", "[password]")
     ```
     ```
     db.setProfilingLevel(1, { slowms: 0, filter: { "command.comment": "backend_query" } })
