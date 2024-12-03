@@ -2,6 +2,7 @@
 /data/*
 server/data
 /mongo_data
+/postgres_data
 
 *__pycache__
 *.py[cod]
