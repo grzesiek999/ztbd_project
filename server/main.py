@@ -14,6 +14,15 @@ from server.core.mongo.database import connect_to_mongo, close_mongo_connection
 
 load_dotenv("../.env")
 
+username = os.getenv('MONGO_USERNAME')
+password = os.getenv('MONGO_PASSWORD')
+host = os.getenv('MONGO_HOST')
+port = os.getenv('MONGO_PORT')
+db_name = os.getenv('MONGO_DB_NAME')
+
+mongo_uri = f"mongodb://{username}:{password}@{host}:{port}/{db_name}?authSource=admin"
+os.environ['MONGO_URI'] = mongo_uri
+
 JSON_DIR = f'../{os.getenv("MONGO_DATA_DIR")}/'
 CSV_DIR = f'../{os.getenv("POSTGRES_DATA_DIR")}/'
 os.makedirs(JSON_DIR, exist_ok=True)
