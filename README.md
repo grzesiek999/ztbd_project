@@ -24,6 +24,9 @@
     db.auth("[username]", "[password]")
     ```
     ```
+    use [db_name]
+    ```
+    ```
     db.setProfilingLevel(1, { slowms: 0, filter: { "command.comment": "backend_query" } })
     ```
    
