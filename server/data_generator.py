@@ -8,6 +8,15 @@ from datetime import datetime, timedelta
 from faker import Faker
 from bson import ObjectId
 
+from dotenv import load_dotenv
+load_dotenv("../.env")
+
+JSON_DIR = f'{os.getenv("MONGO_DATA_DIR")}/'
+CSV_DIR = f'{os.getenv("POSTGRES_DATA_DIR")}/'
+os.makedirs(JSON_DIR, exist_ok=True)
+os.makedirs(CSV_DIR, exist_ok=True)
+
+
 fake = Faker()
 
 USER_COUNT = 1000
