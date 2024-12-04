@@ -13,7 +13,8 @@ from server.core.postgresql.utils import (
     import_gestures,
     import_devices,
     import_device_gestures,
-    import_gesture_logs
+    import_gesture_logs,
+    clear_database
 )
 from server.core.postgresql import database
 
@@ -21,7 +22,7 @@ router = APIRouter()
 
 
 @router.post("/import")
-def import_data(request: ImportRequest):
+def import_data(request: ImportRequest, db_postgre: Session = Depends(database.get_db)):
     generate_data_and_export(
         user_count=request.user_count,
         device_count_range=request.device_count_range,
@@ -39,13 +40,13 @@ def import_data(request: ImportRequest):
         if os.path.exists(file_path):
             run_mongoimport_in_docker(f'{os.getenv("MONGO_CONTAINER_NAME")}', mongo_uri, db_name, file)
 
-    run_postgre_import(database.get_db())
+    run_postgre_import(db_postgre)
 
     return {"message": "Data imported successfully"}
 
 
 @router.post("/delete")
-def delete_data(db: Database = Depends(get_db)):
+def delete_data(db: Database = Depends(get_db), db_postgre: Session = Depends(database.get_db)):
     try:
         collections = db.list_collection_names()
 
@@ -53,7 +54,7 @@ def delete_data(db: Database = Depends(get_db)):
             if collection_name != "system.profile":
                 db[collection_name].delete_many({})
 
-        # TODO: Delete data from Postgres
+        clear_postgre(db_postgre)
 
         return {"message": "All data deleted successfully"}
 
@@ -81,10 +82,14 @@ def run_mongoimport_in_docker(mongo_container_name, mongo_uri, db_name, file_pat
         print(f"Błąd podczas importowania pliku {file_path}: {e}")
 
 
-def run_postgre_import(db: Session = Depends(database.get_db)):
+def run_postgre_import(db: Session):
     import_users(db)
     import_device_types(db)
     import_gestures(db)
     import_devices(db)
     import_device_gestures(db)
     import_gesture_logs(db)
+
+
+def clear_postgre(db: Session):
+    clear_database(db)

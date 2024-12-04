@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 import os
 import csv
@@ -9,6 +9,8 @@ from server.models.postgresql.deviceModel import Device
 from server.models.postgresql.deviceGestureModel import DeviceGesture
 from server.models.postgresql.gestureLogsModel import GestureLogs
 from datetime import datetime
+from sqlalchemy import text
+
 
 
 
@@ -264,3 +266,28 @@ def import_gesture_logs(db: Session):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error importing gesture logs: {str(e)}")
+
+
+
+def clear_database(db: Session):
+    try:
+        db.execute(text("SET session_replication_role = 'replica';"))
+        db.commit()
+
+        result = db.execute(text("""
+            SELECT table_name 
+            FROM information_schema.tables 
+            WHERE table_schema = 'public';
+        """))
+        tables = [row[0] for row in result]
+
+        for table in tables:
+            db.execute(text(f'TRUNCATE TABLE "{table}" CASCADE;'))
+
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        print(f"Błąd podczas czyszczenia bazy danych: {str(e)}")
+    finally:
+        db.execute(text("SET session_replication_role = 'origin';"))
+        db.commit()
