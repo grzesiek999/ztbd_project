@@ -2,12 +2,12 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 import os
 import csv
-from server.models.postgresql.userModel import User
-from server.models.postgresql.gestureModel import Gesture
-from server.models.postgresql.deviceTypeModel import DeviceType
-from server.models.postgresql.deviceModel import Device
-from server.models.postgresql.deviceGestureModel import DeviceGesture
-from server.models.postgresql.gestureLogsModel import GestureLogs
+from models.postgresql.userModel import User
+from models.postgresql.gestureModel import Gesture
+from models.postgresql.deviceTypeModel import DeviceType
+from models.postgresql.deviceModel import Device
+from models.postgresql.deviceGestureModel import DeviceGesture
+from models.postgresql.gestureLogsModel import GestureLogs
 from datetime import datetime
 from sqlalchemy import text
 

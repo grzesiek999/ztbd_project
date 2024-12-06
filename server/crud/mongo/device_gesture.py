@@ -2,8 +2,8 @@ from bson import ObjectId
 from pymongo.database import Database
 from typing import List
 
-from server.crud.mongo.profiler import get_last_query_time
-from server.schemas.mongo.device_gesture import DeviceGestureOut, DeviceGestureUpdate, BulkDeviceGesturesCreate, \
+from crud.mongo.profiler import get_last_query_time
+from schemas.mongo.device_gesture import DeviceGestureOut, DeviceGestureUpdate, BulkDeviceGesturesCreate, \
     DeviceGestureDeletePattern
 
 

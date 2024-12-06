@@ -1,8 +1,8 @@
 from bson import ObjectId
 from pymongo.database import Database
 
-from server.crud.mongo.profiler import get_last_query_time
-from server.schemas.mongo.device import DeviceCreate, BulkDeviceUpdate
+from crud.mongo.profiler import get_last_query_time
+from schemas.mongo.device import DeviceCreate, BulkDeviceUpdate
 from typing import List
 
 

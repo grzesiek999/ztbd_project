@@ -4,7 +4,7 @@ from bson import ObjectId
 from pydantic import BaseModel, BeforeValidator, Field, ConfigDict
 from typing import Annotated
 
-from server.schemas.mongo.device_gesture import DeviceGestureBase
+from schemas.mongo.device_gesture import DeviceGestureBase
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 

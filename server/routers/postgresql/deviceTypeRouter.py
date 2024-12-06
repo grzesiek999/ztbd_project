@@ -1,8 +1,8 @@
 from fastapi import  APIRouter, Depends, HTTPException
-from server.schemas.postgresql import deviceTypeSchemas
-from server.crud.postgresql import deviceTypeCrud
+from schemas.postgresql import deviceTypeSchemas
+from crud.postgresql import deviceTypeCrud
 from sqlalchemy.orm import Session
-from server.core.postgresql import database
+from core.postgresql import database
 
 router = APIRouter(
     prefix="/deviceType",

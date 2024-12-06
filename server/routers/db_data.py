@@ -1,13 +1,13 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from server.data_generator import generate_data_and_export
+from data_generator import generate_data_and_export
 import subprocess
 import os
 from pymongo.database import Database
 
-from server.schemas.db_data import ImportRequest
-from server.core.mongo.database import get_db
-from server.core.postgresql.utils import (
+from schemas.db_data import ImportRequest
+from core.mongo.database import get_db
+from core.postgresql.utils import (
     import_users,
     import_device_types,
     import_gestures,
@@ -16,7 +16,7 @@ from server.core.postgresql.utils import (
     import_gesture_logs,
     clear_database
 )
-from server.core.postgresql import database
+from core.postgresql import database
 
 router = APIRouter()
 
@@ -34,11 +34,17 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
     json_files = ["users.json", "devices.json", "gesture_logs.json"]
     mongo_uri = os.getenv("MONGO_URI")
     db_name = os.getenv("MONGO_DB_NAME", "gesture_control")
+    mongo_data_dir = os.getenv("MONGO_DATA_DOCKER_DIR", "json")
 
     for file in json_files:
-        file_path = f'../{os.getenv("MONGO_DATA_DIR")}/{file}'
+        file_path = f'../{mongo_data_dir}/{file}'
         if os.path.exists(file_path):
-            run_mongoimport_in_docker(f'{os.getenv("MONGO_CONTAINER_NAME")}', mongo_uri, db_name, file)
+            run_mongoimport_in_docker(
+                mongo_container_name='mongo',
+                mongo_uri=mongo_uri,
+                db_name=db_name,
+                file_path=file_path
+            )
 
     run_postgre_import(db_postgre)
 
@@ -69,8 +75,8 @@ def run_mongoimport_in_docker(mongo_container_name, mongo_uri, db_name, file_pat
         "mongoimport",
         "--uri", mongo_uri,
         "--db", db_name,
-        "--collection", file_path.split('.')[0],
-        "--file", f'/{os.getenv("MONGO_DATA_DOCKER_DIR")}/{file_path}',  # Plik JSON w kontenerze
+        "--collection", file_path.split('/')[-1].split('.')[0],  # Kolekcja na podstawie nazwy pliku
+        "--file", file_path,  # Ścieżka do pliku JSON w kontenerze FastAPI
         "--jsonArray",
         "--drop"
     ]
