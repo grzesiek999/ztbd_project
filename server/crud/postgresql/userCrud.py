@@ -61,9 +61,4 @@ def delete_user(db: Session, uid: int):
     return JSONResponse(status_code=200, content={"message": "User deleted"})
 
 def get_users_by_id_list(db: Session, id_list: List[int]):
-    db_users = []
-    for uid in id_list:
-        db_user = db.query(userModel.User).filter(userModel.User.user_id == uid).first()
-        db_users.append(db_user)
-
-    return db_users
+    return db.query(userModel.User).filter(userModel.User.user_id.in_(id_list)).all()

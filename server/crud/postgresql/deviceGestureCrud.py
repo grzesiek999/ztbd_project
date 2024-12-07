@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from server.models.postgresql import deviceGestureModel
 from server.schemas.postgresql import deviceGestureSchemas
+from typing import List
 
 
 # UserGesture CRUD
@@ -31,3 +32,6 @@ def delete_device_gesture(db: Session, dgid: int):
     db.delete(db_device_gesture)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "User gesture deleted"})
+
+def get_device_gestures_by_device_id_list(db: Session, id_list: List[int]):
+    return db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.device_id.in_(id_list)).all()

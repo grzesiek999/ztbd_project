@@ -20,8 +20,10 @@ class DeviceUpdate(DeviceBase):
 
 class Device(DeviceBase):
     device_id: int
+    user_id: int
+    device_type_id: int
 
-    device_gestures: List["DeviceGesture"] = []
+    # device_gestures: List["DeviceGesture"] = []
 
     class Config:
         from_attributes = True
