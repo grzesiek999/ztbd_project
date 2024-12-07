@@ -1,5 +1,8 @@
+import os
+
 from fastapi import FastAPI
 from dotenv import load_dotenv
+# import debugpy
 
 from routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, deviceGestureRouter, gestureLogsRouter
 from routers.db_data import router as import_data_router
@@ -10,6 +13,18 @@ from routers.mongo import log as mongo_gesture_log_router
 from core.mongo.database import connect_to_mongo, close_mongo_connection
 
 load_dotenv()
+
+environment = os.getenv("ENVIRONMENT", "prod")
+
+if environment == "dev":
+    # debugpy.listen(('0.0.0.0', 5678))
+    # print("Czekam na połączenie debugera...")
+    # debugpy.wait_for_attach()
+    # print("Debuger polaczony")
+    reload = True
+else:
+    reload = False
+
 app = FastAPI()
 
 app.add_event_handler("startup", connect_to_mongo)
@@ -37,5 +52,4 @@ app.include_router(import_data_router, prefix="/db", tags=["import_data"])
 
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8081)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload)

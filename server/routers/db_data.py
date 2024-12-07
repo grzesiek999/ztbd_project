@@ -34,10 +34,10 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
     json_files = ["users.json", "devices.json", "gesture_logs.json"]
     mongo_uri = os.getenv("MONGO_URI")
     db_name = os.getenv("MONGO_DB_NAME", "gesture_control")
-    mongo_data_dir = os.getenv("MONGO_DATA_DOCKER_DIR", "json")
+    mongo_data_dir = os.getenv("MONGO_DATA_DIR", "data/json")
 
     for file in json_files:
-        file_path = f'../{mongo_data_dir}/{file}'
+        file_path = f'/{mongo_data_dir}/{file}'
         if os.path.exists(file_path):
             run_mongoimport_in_docker(
                 mongo_container_name='mongo',

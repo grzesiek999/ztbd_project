@@ -44,7 +44,7 @@ services:
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
       - POSTGRES_URI=postgresql+asyncpg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${FASTAPI_PORT_CONTAINER}"]
+    command: ["python", "main.py"]
     depends_on:
       - mongo
       - postgres
@@ -59,6 +59,7 @@ services:
     restart: always
     ports:
       - "${FASTAPI_DEV_PORT_HOST}:${FASTAPI_PORT_CONTAINER}"
+      - "5678:5678"  # port debugowania
     volumes:
       - ./server:/app
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
@@ -66,7 +67,7 @@ services:
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
       - POSTGRES_URI=postgresql+asyncpg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
-    command: ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "${FASTAPI_PORT_CONTAINER}", "--reload"]
+    command: ["python", "main.py"]
     depends_on:
       - mongo
       - postgres
