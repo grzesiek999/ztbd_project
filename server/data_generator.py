@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from faker import Faker
 from bson import ObjectId
 
+
 fake = Faker()
 
 USER_COUNT = 1000

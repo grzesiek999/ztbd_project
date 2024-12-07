@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from schemas.postgresql.deviceGestureSchemas import DeviceGesture
+# from schemas.postgresql.deviceGestureSchemas import DeviceGesture
 
 
 # Device
@@ -20,8 +20,10 @@ class DeviceUpdate(DeviceBase):
 
 class Device(DeviceBase):
     device_id: int
+    user_id: int
+    device_type_id: int
 
-    device_gestures: List["DeviceGesture"] = []
+    # device_gestures: List["DeviceGesture"] = []
 
     class Config:
         from_attributes = True

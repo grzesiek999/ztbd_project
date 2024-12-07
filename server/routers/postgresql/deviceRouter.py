@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from schemas.postgresql import deviceSchemas
+from schemas.postgresql import deviceSchemas, utils
 from crud.postgresql import userCrud, deviceCrud, deviceTypeCrud
 from core.postgresql import database
 from typing import List
@@ -75,3 +75,20 @@ def delete_device(did: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Device not found !")
 
     return deviceCrud.delete_device(db, did)
+
+
+# Queries to test
+
+@router.get("/get_devices_by_user_id_list", response_model=List[deviceSchemas.Device])
+def get_devices_by_user_id_list(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
+    id_list = request.id_list
+
+    if not id_list:
+        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
+
+    db_devices = deviceCrud.get_devices_by_user_id_list(db, id_list)
+
+    if not db_devices:
+        raise HTTPException(status_code=404, detail="Device not found !")
+
+    return db_devices

@@ -43,7 +43,7 @@ services:
       - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
-      - POSTGRES_URI=postgresql+asyncpg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
+      - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
     command: ["python", "main.py"]
     depends_on:
       - mongo
@@ -66,7 +66,7 @@ services:
       - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
-      - POSTGRES_URI=postgresql+asyncpg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
+      - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
     command: ["python", "main.py"]
     depends_on:
       - mongo

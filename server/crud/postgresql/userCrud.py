@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from models.postgresql import userModel
 from schemas.postgresql import userSchemas
 from datetime import datetime
+from typing import List
 
 
 # User CRUD
@@ -58,3 +59,6 @@ def delete_user(db: Session, uid: int):
     db.delete(db_user)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "User deleted"})
+
+def get_users_by_id_list(db: Session, id_list: List[int]):
+    return db.query(userModel.User).filter(userModel.User.user_id.in_(id_list)).all()

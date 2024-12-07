@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List
-from schemas.postgresql.gestureLogsSchemas import GestureLogs
+# from typing import List
+# from schemas.postgresql.gestureLogsSchemas import GestureLogs
 
 
 # UserGesture
@@ -17,7 +17,7 @@ class DeviceGesture(DeviceGestureBase):
     device_gesture_id: int
     gesture_name: str
 
-    gesture_logs: List["GestureLogs"] = []
+    # gesture_logs: List["GestureLogs"] = []
 
     class Config:
         from_attributes = True

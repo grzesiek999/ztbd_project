@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
 from typing import List, Optional
-from schemas.postgresql.deviceSchemas import Device
+# from schemas.postgresql.deviceSchemas import Device
 
 
 # User
@@ -22,7 +22,7 @@ class UserUpdate(UserBase):
 class User(UserBase):
     user_id: int
     created_at: datetime
-    devices: List["Device"] = []
+    # devices: List["Device"] = []
 
     class Config:
         from_attributes = True

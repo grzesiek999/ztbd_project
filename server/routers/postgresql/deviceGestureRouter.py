@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from schemas.postgresql import deviceGestureSchemas
+from schemas.postgresql import deviceGestureSchemas, utils
 from crud.postgresql import deviceGestureCrud, deviceCrud, gestureCrud
 from core.postgresql import database
 from typing import List
@@ -64,3 +64,20 @@ def delete_device_gesture(dgid: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="UserGesture not found !")
 
     return deviceGestureCrud.delete_device_gesture(db, dgid)
+
+
+# Queries to test
+
+@router.get("/get_device_gestures_by_device_id_list", response_model=List[deviceGestureSchemas.DeviceGesture])
+def get_device_gestures_by_device_id_list(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
+    id_list = request.id_list
+
+    if not id_list:
+        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
+
+    db_device_gestures = deviceGestureCrud.get_device_gestures_by_device_id_list(db, id_list)
+
+    if not db_device_gestures:
+        raise HTTPException(status_code=404, detail="UserGesture not found !")
+
+    return db_device_gestures
