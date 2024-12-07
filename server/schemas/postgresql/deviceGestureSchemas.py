@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-from typing import List
-from schemas.postgresql.gestureLogsSchemas import GestureLogs
+# from typing import List
+# from schemas.postgresql.gestureLogsSchemas import GestureLogs
 
 
 # UserGesture

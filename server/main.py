@@ -11,6 +11,7 @@ from routers.mongo import device as mongo_device_router
 from routers.mongo import device_gesture as mongo_device_gesture_router
 from routers.mongo import log as mongo_gesture_log_router
 from core.mongo.database import connect_to_mongo, close_mongo_connection
+from core.postgresql.database import connect_to_postgres, close_postgres_connection
 
 load_dotenv()
 
@@ -30,6 +31,9 @@ app = FastAPI()
 app.add_event_handler("startup", connect_to_mongo)
 app.add_event_handler("shutdown", close_mongo_connection)
 
+app.add_event_handler("startup", connect_to_postgres)
+app.add_event_handler("shutdown", close_postgres_connection)
+
 app.include_router(basicRouter.router)
 
 app.include_router(userRouter.router)
@@ -48,7 +52,6 @@ app.include_router(mongo_device_gesture_router.router, prefix="/mongo/device_ges
 app.include_router(mongo_gesture_log_router.router, prefix="/mongo/gesture_logs", tags=["Mongo gesture_logs"])
 app.include_router(import_data_router, prefix="/db", tags=["import_data"])
 
-# database.Base.metadata.create_all(bind=database.engine)
 
 if __name__ == "__main__":
     import uvicorn

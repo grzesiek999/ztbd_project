@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
-from server.schemas.postgresql import userSchemas, utils
-from server.crud.postgresql import userCrud
-from server.core.postgresql import database
+from schemas.postgresql import userSchemas, utils
+from crud.postgresql import userCrud
+from core.postgresql import database
 import time
 
 

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from server.schemas.postgresql import deviceGestureSchemas, utils
-from server.crud.postgresql import deviceGestureCrud, deviceCrud, gestureCrud
-from server.core.postgresql import database
+from schemas.postgresql import deviceGestureSchemas, utils
+from crud.postgresql import deviceGestureCrud, deviceCrud, gestureCrud
+from core.postgresql import database
 from typing import List
 
 

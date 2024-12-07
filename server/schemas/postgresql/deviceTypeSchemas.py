@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from schemas.postgresql.deviceSchemas import Device
+# from schemas.postgresql.deviceSchemas import Device
 
 
 class DeviceTypeBase(BaseModel):
@@ -19,7 +19,7 @@ class DeviceTypeUpdate(DeviceTypeBase):
 class DeviceType(DeviceTypeBase):
     device_type_id: int
 
-    devices: List["Device"] = []
+    # devices: List["Device"] = []
 
     class Config:
         from_attributes = True

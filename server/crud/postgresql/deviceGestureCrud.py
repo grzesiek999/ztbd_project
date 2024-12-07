@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
-from server.models.postgresql import deviceGestureModel
-from server.schemas.postgresql import deviceGestureSchemas
+from models.postgresql import deviceGestureModel
+from schemas.postgresql import deviceGestureSchemas
 from typing import List
 
 
