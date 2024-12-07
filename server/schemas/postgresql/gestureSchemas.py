@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Optional
-from server.schemas.postgresql.deviceGestureSchemas import DeviceGesture
+from schemas.postgresql.deviceGestureSchemas import DeviceGesture
 
 
 # Gesture

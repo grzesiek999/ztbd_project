@@ -2,9 +2,9 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 
-from server.schemas.mongo.user import UserCreate, UserIDsRequest, BulkUserUpdate
-from server.crud.mongo import user as crud_user
-from server.core.mongo.database import get_db
+from schemas.mongo.user import UserCreate, UserIDsRequest, BulkUserUpdate
+from crud.mongo import user as crud_user
+from core.mongo.database import get_db
 
 router = APIRouter()
 

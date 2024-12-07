@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import relationship
-from server.core.postgresql.database import Base
+from core.postgresql.database import Base
 
 
 class DeviceType(Base):

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
-from server.models.postgresql import deviceModel
-from server.schemas.postgresql import deviceSchemas
+from models.postgresql import deviceModel
+from schemas.postgresql import deviceSchemas
 
 
 # Device CRUD

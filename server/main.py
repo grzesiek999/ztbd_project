@@ -2,31 +2,28 @@ import os
 
 from fastapi import FastAPI
 from dotenv import load_dotenv
+# import debugpy
 
-from server.routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, deviceGestureRouter, gestureLogsRouter
-from server.core.postgresql import database
-from server.routers.db_data import router as import_data_router
-from server.routers.mongo import user as mongo_user_router
-from server.routers.mongo import device as mongo_device_router
-from server.routers.mongo import device_gesture as mongo_device_gesture_router
-from server.routers.mongo import log as mongo_gesture_log_router
-from server.core.mongo.database import connect_to_mongo, close_mongo_connection
+from routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, deviceGestureRouter, gestureLogsRouter
+from routers.db_data import router as import_data_router
+from routers.mongo import user as mongo_user_router
+from routers.mongo import device as mongo_device_router
+from routers.mongo import device_gesture as mongo_device_gesture_router
+from routers.mongo import log as mongo_gesture_log_router
+from core.mongo.database import connect_to_mongo, close_mongo_connection
 
-load_dotenv("../.env")
+load_dotenv()
 
-username = os.getenv('MONGO_USERNAME')
-password = os.getenv('MONGO_PASSWORD')
-host = os.getenv('MONGO_HOST')
-port = os.getenv('MONGO_PORT')
-db_name = os.getenv('MONGO_DB_NAME')
+environment = os.getenv("ENVIRONMENT", "prod")
 
-mongo_uri = f"mongodb://{username}:{password}@{host}:{port}/{db_name}?authSource=admin"
-os.environ['MONGO_URI'] = mongo_uri
-
-JSON_DIR = f'../{os.getenv("MONGO_DATA_DIR")}/'
-CSV_DIR = f'../{os.getenv("POSTGRES_DATA_DIR")}/'
-os.makedirs(JSON_DIR, exist_ok=True)
-os.makedirs(CSV_DIR, exist_ok=True)
+if environment == "dev":
+    # debugpy.listen(('0.0.0.0', 5678))
+    # print("Czekam na połączenie debugera...")
+    # debugpy.wait_for_attach()
+    # print("Debuger polaczony")
+    reload = True
+else:
+    reload = False
 
 app = FastAPI()
 
@@ -55,5 +52,4 @@ app.include_router(import_data_router, prefix="/db", tags=["import_data"])
 
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="127.0.0.1", port=8081)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=reload)

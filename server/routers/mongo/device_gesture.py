@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 
-from server.schemas.mongo.device import DeviceIDsRequest
-from server.schemas.mongo.device_gesture import DeviceGestureUpdate, BulkDeviceGesturesCreate, \
+from schemas.mongo.device import DeviceIDsRequest
+from schemas.mongo.device_gesture import DeviceGestureUpdate, BulkDeviceGesturesCreate, \
     DeviceGestureDeletePattern
-from server.crud.mongo import device_gesture as crud_device_gesture
-from server.core.mongo.database import get_db
+from crud.mongo import device_gesture as crud_device_gesture
+from core.mongo.database import get_db
 
 router = APIRouter()
 

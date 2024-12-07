@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from typing import List
 from pymongo.database import Database
 
-from server.schemas.mongo.log import LogOut, LogCreate
-from server.crud.mongo import log as crud_log
-from server.core.mongo.database import get_db
+from schemas.mongo.log import LogOut, LogCreate
+from crud.mongo import log as crud_log
+from core.mongo.database import get_db
 
 router = APIRouter()
 
