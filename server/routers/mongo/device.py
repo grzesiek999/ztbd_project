@@ -2,10 +2,10 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 
-from server.schemas.mongo.device import DeviceCreate, DeviceIDsRequest, UserIDsRequest, \
+from schemas.mongo.device import DeviceCreate, DeviceIDsRequest, UserIDsRequest, \
     BulkDeviceUpdate
-from server.crud.mongo import device as crud_device
-from server.core.mongo.database import get_db
+from crud.mongo import device as crud_device
+from core.mongo.database import get_db
 
 router = APIRouter()
 

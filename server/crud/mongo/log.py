@@ -1,8 +1,8 @@
 from pymongo.database import Database
 from bson import ObjectId
 import datetime
-from server.models.mongo.log import GestureLog
-from server.schemas.mongo.log import LogCreate
+from models.mongo.log import GestureLog
+from schemas.mongo.log import LogCreate
 
 
 def create_gesture_log(db: Database, log_in: LogCreate) -> GestureLog:

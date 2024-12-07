@@ -3,8 +3,8 @@ from typing import List
 
 from pymongo.database import Database
 
-from server.crud.mongo.profiler import get_last_query_time
-from server.schemas.mongo.user import UserCreate, BulkUserUpdate
+from crud.mongo.profiler import get_last_query_time
+from schemas.mongo.user import UserCreate, BulkUserUpdate
 from bson import ObjectId
 
 

@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
-from server.models.postgresql import gestureLogsModel
+from models.postgresql import gestureLogsModel
 
 
 

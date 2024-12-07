@@ -199,8 +199,8 @@ def write_json(json_dir, filename, data):
 
 
 def export_data(data):
-    csv_dir = f'../{os.getenv("POSTGRES_DATA_DIR")}/'
-    json_dir = f'../{os.getenv("MONGO_DATA_DIR")}/'
+    csv_dir = f'/{os.getenv("POSTGRES_DATA_DIR")}/'
+    json_dir = f'/{os.getenv("MONGO_DATA_DIR")}'
     os.makedirs(json_dir, exist_ok=True)
     os.makedirs(csv_dir, exist_ok=True)
 
@@ -232,5 +232,5 @@ def generate_data_and_export(user_count=USER_COUNT, device_types=device_types, g
     export_data(data)
 
 
-generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
-                                 device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)
+# generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
+#                                  device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)
