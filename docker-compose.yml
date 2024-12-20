@@ -1,13 +1,21 @@
 services:
   mongo:
-    image: mongo:latest
-#    container_name: ${MONGO_CONTAINER_NAME}
+#    image: mongo:latest
+    build:
+      context: ./mongo
+      args:
+        MONGO_SSH_USERNAME: ${MONGO_SSH_USERNAME}
+        MONGO_SSH_PASSWORD: ${MONGO_SSH_PASSWORD}
+    container_name: ${MONGO_CONTAINER_NAME}
     restart: always
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_SSH_USERNAME=${MONGO_SSH_USERNAME}
+      - MONGO_SSH_PASSWORD=${MONGO_SSH_PASSWORD}
     ports:
       - "${MONGO_PORT_HOST}:${MONGO_PORT}"
+      - "22:22"
     volumes:
       - mongo_data:/data/db
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DOCKER_DIR}
@@ -16,7 +24,7 @@ services:
 
   postgres:
     image: postgres:latest
-#    container_name: ${POSTGRES_CONTAINER_NAME}
+    container_name: ${POSTGRES_CONTAINER_NAME}
     restart: always
     environment:
       POSTGRES_USER: ${POSTGRES_USERNAME}
@@ -34,7 +42,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
-#    container_name: fastapi
+    container_name: ${FASTAPI_CONTAINER_NAME}
     restart: always
     ports:
       - "${FASTAPI_PORT_HOST}:${FASTAPI_PORT_CONTAINER}"
@@ -42,8 +50,13 @@ services:
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
       - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
     environment:
-      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
-      - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
+      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CONTAINER_NAME}:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
+      - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_CONTAINER_NAME}/${POSTGRES_DB_NAME}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_SSH_USERNAME=${MONGO_SSH_USERNAME}
+      - MONGO_SSH_PASSWORD=${MONGO_SSH_PASSWORD}
     command: ["python", "main.py"]
     depends_on:
       - mongo
@@ -55,7 +68,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile.dev
-#    container_name: fastapi_dev
+    container_name: ${FASTAPIDEV_CONTAINER_NAME}
     restart: always
     ports:
       - "${FASTAPI_DEV_PORT_HOST}:${FASTAPI_PORT_CONTAINER}"
@@ -65,8 +78,13 @@ services:
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
       - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
     environment:
-      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
-      - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
+      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CONTAINER_NAME}:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
+      - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_CONTAINER_NAME}/${POSTGRES_DB_NAME}
+      - MONGO_DB_NAME=${MONGO_DB_NAME}
+      - MONGO_USERNAME=${MONGO_USERNAME}
+      - MONGO_PASSWORD=${MONGO_PASSWORD}
+      - MONGO_SSH_USERNAME=${MONGO_SSH_USERNAME}
+      - MONGO_SSH_PASSWORD=${MONGO_SSH_PASSWORD}
     command: ["python", "main.py"]
     depends_on:
       - mongo
