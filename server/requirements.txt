@@ -10,3 +10,4 @@ pydantic[email]
 Faker
 python-dotenv
 greenlet
+paramiko
