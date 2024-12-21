@@ -123,3 +123,21 @@ def create_users(user_list: List[userSchemas.UserCreate], db: Session = Depends(
     query_time = end - start
 
     return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.patch("/update_users")
+def create_users(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
+
+    if not user_list:
+        raise HTTPException(status_code=400, detail="The cannot be empty.")
+
+    start = time.time()
+    for user in user_list:
+        try:
+            userCrud.update_user(db, user)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
