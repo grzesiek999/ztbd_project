@@ -41,6 +41,7 @@ services:
     volumes:
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
       - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
       - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
@@ -64,6 +65,7 @@ services:
       - ./server:/app
       - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
       - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongo:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
       - POSTGRES_URI=postgresql+psycopg://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@postgres/${POSTGRES_DB_NAME}
