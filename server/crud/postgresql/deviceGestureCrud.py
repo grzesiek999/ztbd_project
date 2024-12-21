@@ -17,7 +17,7 @@ def get_device_gestures_by_device_id(db: Session, did: int):
     return db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.device_id == did).all()
 
 def create_device_gesture(db: Session, deviceGesture: deviceGestureSchemas.DeviceGestureCreate):
-    db_device_gesture = deviceGesture.DeviceGesture(
+    db_device_gesture = deviceGestureModel.DeviceGesture(
         gesture_name=deviceGesture.gesture_name,
         gesture_id=deviceGesture.gesture_id,
         device_id=deviceGesture.device_id

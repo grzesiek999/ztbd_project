@@ -24,7 +24,7 @@ def get_users_by_created_at(db: Session, created_at: datetime):
     return db.query(userModel.User).filter(func.date(userModel.User.created_at) == target_date).all()
 
 def create_user(db: Session, user: userSchemas.UserCreate):
-    db_user = user.User(
+    db_user = userModel.User(
         username=user.username,
         email=user.email.lower(),
         password_hash=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)

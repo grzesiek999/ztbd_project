@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from schemas.postgresql import deviceSchemas, utils
 from crud.postgresql import userCrud, deviceCrud, deviceTypeCrud
 from core.postgresql import database
 from typing import List
+import time
+
 
 
 router = APIRouter(
@@ -86,9 +89,30 @@ def get_devices_by_user_id_list(request: utils.IdListRequest, db: Session = Depe
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    start = time.time()
     db_devices = deviceCrud.get_devices_by_user_id_list(db, id_list)
+    end = time.time()
+    query_time = end - start
 
     if not db_devices:
-        raise HTTPException(status_code=404, detail="Device not found !")
+        raise HTTPException(status_code=404, detail="No devices found for the provided IDs.")
 
-    return db_devices
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.post("/create_devices")
+def create_devices(device_list: List[deviceSchemas.DeviceCreate], db: Session = Depends(database.get_db)):
+
+    if not device_list:
+        raise HTTPException(status_code=400, detail="The cannot be empty.")
+
+    start = time.time()
+    for device in device_list:
+        try:
+            deviceCrud.create_device(db, device)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to create device: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})

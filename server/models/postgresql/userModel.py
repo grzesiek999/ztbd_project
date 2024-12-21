@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     username = Column(String(255), index=True)
     email = Column(String(255), index=True, unique=True)
     password_hash = Column(String(255))
