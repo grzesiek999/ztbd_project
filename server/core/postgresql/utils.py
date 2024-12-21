@@ -15,7 +15,7 @@ from sqlalchemy import text
 
 
 def import_users(db: Session):
-    file_path = os.path.join("data", "csv", "users.csv")
+    file_path = os.path.join("/data", "csv", "users.csv")
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {file_path} not found.")
@@ -62,7 +62,7 @@ def import_users(db: Session):
 
 
 def import_device_types(db: Session):
-    file_path = os.path.join("data", "csv", "device_types.csv")
+    file_path = os.path.join("/data", "csv", "device_types.csv")
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {file_path} not found.")
@@ -106,7 +106,7 @@ def import_device_types(db: Session):
 
 
 def import_gestures(db: Session):
-    file_path = os.path.join("data", "csv", "gestures.csv")
+    file_path = os.path.join("/data", "csv", "gestures.csv")
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {file_path} not found.")
@@ -151,7 +151,7 @@ def import_gestures(db: Session):
 
 
 def import_devices(db: Session):
-    file_path = os.path.join("data", "csv", "devices.csv")
+    file_path = os.path.join("/data", "csv", "devices.csv")
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {file_path} not found.")
@@ -191,7 +191,7 @@ def import_devices(db: Session):
 
 
 def import_device_gestures(db: Session):
-    file_path = os.path.join("data", "csv", "device_gestures.csv")
+    file_path = os.path.join("/data", "csv", "device_gestures.csv")
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {file_path} not found.")
@@ -231,7 +231,7 @@ def import_device_gestures(db: Session):
 
 
 def import_gesture_logs(db: Session):
-    file_path = os.path.join("data", "csv", "gesture_logs.csv")
+    file_path = os.path.join("/data", "csv", "gesture_logs.csv")
 
     if not os.path.exists(file_path):
         raise HTTPException(status_code=404, detail=f"File {file_path} not found.")
