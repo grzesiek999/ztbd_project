@@ -17,7 +17,7 @@ from core.postgresql.utils import (
     clear_database
 )
 from core.postgresql import database
-import paramiko
+# import paramiko
 from urllib.parse import urlparse
 
 router = APIRouter()
@@ -32,12 +32,12 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
         log_count=request.log_count
     )
 
-    mongo_import()
+   #  mongo_import()
     run_postgre_import(db_postgre)
 
     return {"message": "Data imported successfully"}
 
-
+'''
 @router.post("/delete")
 def delete_data(db: Database = Depends(get_db), db_postgre: Session = Depends(database.get_db)):
     try:
@@ -112,7 +112,7 @@ def run_mongoimport_file(mongo_uri: str, db_name: str, file_path: str, ssh_clien
     # else:
     #     print(f"Error importing data: {result.stderr}")
 
-
+'''
 def run_postgre_import(db: Session):
     import_users(db)
     import_device_types(db)
