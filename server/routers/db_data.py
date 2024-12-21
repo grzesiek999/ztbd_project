@@ -17,6 +17,8 @@ from core.postgresql.utils import (
     clear_database
 )
 from core.postgresql import database
+import paramiko
+from urllib.parse import urlparse
 
 router = APIRouter()
 
@@ -30,22 +32,7 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
         log_count=request.log_count
     )
 
-    # Wykonanie mongoimport za pomocą subprocess
-    json_files = ["users.json", "devices.json", "gesture_logs.json"]
-    mongo_uri = os.getenv("MONGO_URI")
-    db_name = os.getenv("MONGO_DB_NAME", "gesture_control")
-    mongo_data_dir = os.getenv("MONGO_DATA_DIR", "data/json")
-
-    for file in json_files:
-        file_path = f'/{mongo_data_dir}/{file}'
-        if os.path.exists(file_path):
-            run_mongoimport_in_docker(
-                mongo_container_name='mongo',
-                mongo_uri=mongo_uri,
-                db_name=db_name,
-                file_path=file_path
-            )
-
+    mongo_import()
     run_postgre_import(db_postgre)
 
     return {"message": "Data imported successfully"}
@@ -68,24 +55,62 @@ def delete_data(db: Database = Depends(get_db), db_postgre: Session = Depends(da
         return {"error": str(e)}
 
 
-def run_mongoimport_in_docker(mongo_container_name, mongo_uri, db_name, file_path):
-    # Wywołanie mongoimport w kontenerze Docker
-    mongoimport_command = [
-        "docker", "exec", mongo_container_name,
-        "mongoimport",
-        "--uri", mongo_uri,
-        "--db", db_name,
-        "--collection", file_path.split('/')[-1].split('.')[0],  # Kolekcja na podstawie nazwy pliku
-        "--file", file_path,  # Ścieżka do pliku JSON w kontenerze FastAPI
-        "--jsonArray",
-        "--drop"
-    ]
+def mongo_import() -> None:
+    json_files = ["users.json", "devices.json", "gesture_logs.json"]
+    mongo_uri = os.getenv("MONGO_URI")
+    db_name = os.getenv("MONGO_DB_NAME", "gesture_control")
+    mongo_data_dir = os.getenv("MONGO_DATA_DOCKER_DIR", "json")
 
-    try:
-        subprocess.run(mongoimport_command, check=True)
-        print(f"Plik {file_path} zaimportowany pomyślnie!")
-    except subprocess.CalledProcessError as e:
-        print(f"Błąd podczas importowania pliku {file_path}: {e}")
+    username = os.getenv("MONGO_SSH_USERNAME")
+    password = os.getenv("MONGO_SSH_PASSWORD")
+    host_name = os.getenv("MONGO_CONTAINER_NAME")
+
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(host_name, port=22, username=username, password=password)
+
+    for file in json_files:
+        file_path = f'/{mongo_data_dir}/{file}'
+        run_mongoimport_file(
+            mongo_uri=mongo_uri,
+            db_name=db_name,
+            file_path=file_path,
+            ssh_client=ssh_client
+        )
+    ssh_client.close()
+
+
+def run_mongoimport_file(mongo_uri: str, db_name: str, file_path: str, ssh_client) -> None:
+    collection_name = file_path.split('/')[-1].split('.')[0]
+
+    command = f"mongoimport --uri {mongo_uri} --db {db_name} --collection {collection_name} --file {file_path} --jsonArray --drop"
+    stdin, stdout, stderr = ssh_client.exec_command(command)
+
+    output = stdout.read().decode('utf-8')
+    error = stderr.read().decode('utf-8')
+    if output:
+        print(output)
+    if error:
+        print(f"Error importing data into {db_name}.{collection_name}, error: {error}")
+    else:
+        print(f"Data imported successfully into {db_name}.{collection_name}")
+
+    # mongoimport_command = [
+    #     "mongoimport",
+    #     "--uri", mongo_uri,
+    #     "--db", db_name,
+    #     "--collection", collection_name,
+    #     "--file", file_path,
+    #     "--jsonArray",
+    #     "--drop"
+    # ]
+    #
+    # result = subprocess.run(mongoimport_command, capture_output=True, text=True)
+    #
+    # if result.returncode == 0:
+    #     print(f"Data imported successfully into {db_name}.{collection_name}")
+    # else:
+    #     print(f"Error importing data: {result.stderr}")
 
 
 def run_postgre_import(db: Session):

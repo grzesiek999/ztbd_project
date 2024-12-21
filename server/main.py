@@ -20,7 +20,7 @@ environment = os.getenv("ENVIRONMENT", "prod")
 if environment == "dev":
     # debugpy.listen(('0.0.0.0', 5678))
     # print("Czekam na połączenie debugera...")
-    # debugpy.wait_for_attach()
+    # debugpy.wait_for_client()
     # print("Debuger polaczony")
     reload = True
 else:
