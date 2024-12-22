@@ -94,6 +94,24 @@ services:
     networks:
       - backend
 
+  react-app:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: ${REACTAPP_CONTAINER_NAME}
+    restart: always
+    ports:
+      - "${REACTAPP_PORT_HOST}:${REACTAPP_PORT_CONTAINER}"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    working_dir: /app
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - fastapi
+      - fastapi_dev
+
 volumes:
   mongo_data:
     driver: local
