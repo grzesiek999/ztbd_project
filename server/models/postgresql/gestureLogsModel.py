@@ -9,7 +9,7 @@ class GestureLogs(Base):
     __tablename__ = 'gestureLogs'
 
     log_id = Column(Integer, primary_key=True, index=True)
-    device_gesture_id = Column(Integer, ForeignKey('device_gestures.device_gesture_id'), index=True)
+    device_gesture_id = Column(Integer, ForeignKey('device_gestures.device_gesture_id', ondelete="CASCADE"), index=True)
     timestamp = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     device_gesture = relationship("DeviceGesture", back_populates="gesture_logs")
