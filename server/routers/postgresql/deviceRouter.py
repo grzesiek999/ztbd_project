@@ -116,3 +116,40 @@ def create_devices(device_list: List[deviceSchemas.DeviceCreate], db: Session = 
     query_time = end - start
 
     return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.patch("/update_devices")
+def update_devices(device_list: List[deviceSchemas.DeviceUpdate], db: Session = Depends(database.get_db)):
+
+    if not device_list:
+        raise HTTPException(status_code=400, detail="The cannot be empty.")
+
+    start = time.time()
+    for device in device_list:
+        try:
+            deviceCrud.update_device(db, device)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to update device: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.delete("/delete_devices")
+def delete_devices(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
+    id_list = request.id_list
+
+    if not id_list:
+        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
+
+    start = time.time()
+    for did in id_list:
+        try:
+            deviceCrud.delete_device(db, did)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})

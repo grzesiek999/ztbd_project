@@ -126,7 +126,7 @@ def create_users(user_list: List[userSchemas.UserCreate], db: Session = Depends(
 
 
 @router.patch("/update_users")
-def create_users(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
+def update_users(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
 
     if not user_list:
         raise HTTPException(status_code=400, detail="The cannot be empty.")
@@ -137,6 +137,25 @@ def create_users(user_list: List[userSchemas.UserUpdate], db: Session = Depends(
             userCrud.update_user(db, user)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.delete("/delete_users")
+def delete_users(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
+    id_list = request.id_list
+
+    if not id_list:
+        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
+
+    start = time.time()
+    for uid in id_list:
+        try:
+            userCrud.delete_user(db, uid)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
     end = time.time()
     query_time = end - start
 
