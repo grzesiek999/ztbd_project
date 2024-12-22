@@ -17,7 +17,7 @@ def get_devices_by_device_type_id(db: Session, dtid: int):
     return db.query(deviceModel.Device).filter(deviceModel.Device.device_type_id == dtid).all()
 
 def create_device(db: Session, device: deviceSchemas.DeviceCreate):
-    db_device = device.Device(
+    db_device = deviceModel.Device(
         device_name =  device.device_name.lower(),
         device_type_id = device.device_type_id,
         user_id = device.user_id

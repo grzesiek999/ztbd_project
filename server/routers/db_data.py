@@ -37,7 +37,7 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
 
     return {"message": "Data imported successfully"}
 
-'''
+
 @router.post("/delete")
 def delete_data(db: Database = Depends(get_db), db_postgre: Session = Depends(database.get_db)):
     try:
@@ -54,7 +54,7 @@ def delete_data(db: Database = Depends(get_db), db_postgre: Session = Depends(da
     except Exception as e:
         return {"error": str(e)}
 
-
+'''
 def mongo_import() -> None:
     json_files = ["users.json", "devices.json", "gesture_logs.json"]
     mongo_uri = os.getenv("MONGO_URI")

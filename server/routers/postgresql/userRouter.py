@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from datetime import datetime
 from typing import List
@@ -18,10 +19,7 @@ router = APIRouter(
 @router.get("/get_user_by_id", response_model=userSchemas.User)
 def get_user_by_id(uid: int, db: Session = Depends(database.get_db)):
 
-    start = time.time()
     db_user = userCrud.get_user_by_id(db, uid)
-    end = time.time()
-    print(end - start)
 
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found !")
@@ -91,16 +89,74 @@ def delete_user(uid: int, db: Session = Depends(database.get_db)):
 
 # Queries to test
 
-@router.get("/get_users_by_id_list", response_model=List[userSchemas.User])
+@router.get("/get_users_by_id_list")
 def get_users_by_id_list(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
     id_list = request.id_list
 
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    start = time.time()
     db_users = userCrud.get_users_by_id_list(db, id_list=id_list)
+    end = time.time()
+    query_time = end - start
 
     if not db_users:
         raise HTTPException(status_code=404, detail="No users found for the provided IDs.")
 
-    return db_users
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.post("/create_users")
+def create_users(user_list: List[userSchemas.UserCreate], db: Session = Depends(database.get_db)):
+
+    if not user_list:
+        raise HTTPException(status_code=400, detail="The cannot be empty.")
+
+    start = time.time()
+    for user in user_list:
+        try:
+            userCrud.create_user(db, user)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to create user: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.patch("/update_users")
+def update_users(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
+
+    if not user_list:
+        raise HTTPException(status_code=400, detail="The cannot be empty.")
+
+    start = time.time()
+    for user in user_list:
+        try:
+            userCrud.update_user(db, user)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.delete("/delete_users")
+def delete_users(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
+    id_list = request.id_list
+
+    if not id_list:
+        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
+
+    start = time.time()
+    for uid in id_list:
+        try:
+            userCrud.delete_user(db, uid)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})

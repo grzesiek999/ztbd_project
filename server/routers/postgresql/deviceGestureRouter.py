@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from schemas.postgresql import deviceGestureSchemas, utils
 from crud.postgresql import deviceGestureCrud, deviceCrud, gestureCrud
 from core.postgresql import database
 from typing import List
+import time
 
 
 router = APIRouter(
@@ -81,3 +83,21 @@ def get_device_gestures_by_device_id_list(request: utils.IdListRequest, db: Sess
         raise HTTPException(status_code=404, detail="UserGesture not found !")
 
     return db_device_gestures
+
+
+@router.post("/create_devices_gestures")
+def create_devices_gestures(device_gesture_list: List[deviceGestureSchemas.DeviceGestureCreate], db: Session = Depends(database.get_db)):
+
+    if not device_gesture_list:
+        raise HTTPException(status_code=400, detail="The cannot be empty.")
+
+    start = time.time()
+    for device_gesture in device_gesture_list:
+        try:
+            deviceGestureCrud.create_device_gesture(db, device_gesture)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to create device gesture: {str(e)}")
+    end = time.time()
+    query_time = end - start
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
