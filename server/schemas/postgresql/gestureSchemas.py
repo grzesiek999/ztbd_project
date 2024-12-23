@@ -17,6 +17,9 @@ class GestureUpdate(GestureBase):
     gesture_type: Optional[str] = None
     description: Optional[str] = None
 
+class GestureUpdateByType(GestureBase):
+    pass
+
 class Gesture(GestureBase):
     gesture_id: int
 

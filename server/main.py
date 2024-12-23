@@ -1,10 +1,11 @@
 import os
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 # import debugpy
 
-from routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, deviceGestureRouter, gestureLogsRouter
+from routers.postgresql import basicRouter, userRouter, gestureRouter, deviceRouter, deviceGestureRouter, gestureLogsRouter, toTest
 from routers.db_data import router as import_data_router
 from routers.mongo import user as mongo_user_router
 from routers.mongo import device as mongo_device_router
@@ -28,6 +29,19 @@ else:
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.add_event_handler("startup", connect_to_mongo)
 app.add_event_handler("shutdown", close_mongo_connection)
 
@@ -45,6 +59,8 @@ app.include_router(deviceRouter.router)
 app.include_router(deviceGestureRouter.router)
 
 app.include_router(gestureLogsRouter.router)
+
+app.include_router(toTest.router)
 
 app.include_router(mongo_user_router.router, prefix="/mongo/users", tags=["Mongo users"])
 app.include_router(mongo_device_router.router, prefix="/mongo/devices", tags=["Mongo devices"])
