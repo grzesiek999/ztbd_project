@@ -60,8 +60,3 @@ def delete_gesture(gid: int, db: Session = Depends(database.get_db)):
         raise HTTPException(status_code=404, detail="Gesture not found !")
 
     return gestureCrud.delete_gesture(db, gid)
-
-
-# Query to test
-
-#@router.patch("/up")

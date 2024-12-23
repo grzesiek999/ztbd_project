@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from typing import List
-from schemas.postgresql import userSchemas, utils, deviceSchemas, deviceGestureSchemas
-from crud.postgresql import userCrud, deviceCrud, deviceTypeCrud, deviceGestureCrud, utilsCrud
+from schemas.postgresql import userSchemas, utils, deviceSchemas, deviceGestureSchemas, gestureSchemas
+from crud.postgresql import userCrud, deviceCrud, deviceTypeCrud, deviceGestureCrud, utilsCrud, gestureCrud
 from core.postgresql import database
 import time
 
@@ -213,6 +213,23 @@ def delete_devices_gestures(gesture_type: str, db: Session = Depends(database.ge
         deviceGestureCrud.delete_devices_gestures_by_gesture_type(db, gesture_type)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
+    end = time.time()
+    query_time = (end - start) * 1000
+
+    return JSONResponse(status_code=200, content={"Query Time:": query_time})
+
+
+@router.patch("/update_gesture_by_type")
+def update_gesture_by_type(gesture: gestureSchemas.GestureUpdateByType, db: Session = Depends(database.get_db)):
+
+    if not gesture:
+        raise HTTPException(status_code=400, detail="The gesture cannot be empty.")
+
+    start = time.time()
+    try:
+        gestureCrud.update_gesture_by_type(db, gesture)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to update gesture: {str(e)}")
     end = time.time()
     query_time = (end - start) * 1000
 

@@ -47,3 +47,19 @@ def delete_gesture(db: Session, gid: int):
     db.delete(db_gesture)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "Gesture deleted"})
+
+def update_gesture_by_type(db: Session, gesture: gestureSchemas.GestureUpdateByType):
+    db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
+
+    try:
+        if gesture.description is not None:
+            db_gesture.description = gesture.description
+
+        db.commit()
+        db.refresh(db_gesture)
+    except Exception as e:
+        db.rollback()
+        print(f"Error: {e}")
+        return False
+
+    return db_gesture
