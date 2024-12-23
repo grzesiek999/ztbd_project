@@ -1,10 +1,13 @@
+import Router from "./Routing/Routing.tsx";
+import './styles/index.scss';
 
 
-export default function App() {
 
-  return (
-    <>
-      test
-    </>
-  )
+const App = () => {
+
+    return (
+        <Router />
+    )
 }
+
+export default App
