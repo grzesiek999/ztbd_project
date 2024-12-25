@@ -1,6 +1,6 @@
 .data-generator-div {
-  width: 400px;
-  padding: 50px 30px;
+  width: 350px;
+  padding: 30px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -14,33 +14,36 @@
 }
 
 .data-generator-div form {
-  width: 300px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 
 .data-generator-div form span{
-  width: 100%;
+  min-width: 100%;
   text-align: center;
-  margin-bottom: 25px;
-  font-size: 24px;
+  margin-bottom: 15px;
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 600;
+  font-style: normal;
 }
 
 .data-generator-div form label{
-  margin-bottom: 10px;
-  font-size: 18px;
+  margin-bottom: 5px;
+  font-size: 16px;
 }
 
 .data-generator-div form input{
   outline: none;
-  margin-bottom: 25px;
-  font-size: 18px;
-  line-height: 24px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  line-height: 20px;
   box-sizing: border-box;
   padding-left: 10px;
   min-width: 100%;
-  height: 40px;
+  height: 32px;
   background-color: #f3edda;
   border: 1px solid #a8ada2;
   border-radius: 4px;
@@ -52,7 +55,7 @@
 }
 
 .data-generator-button{
-  margin: 10px 0;
+  margin-top: 10px;
   padding: 10px;
   display: flex;
   justify-content: center;

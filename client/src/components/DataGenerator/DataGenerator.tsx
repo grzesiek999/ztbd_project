@@ -1,29 +1,29 @@
-import {SyntheticEvent, useState} from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 
 
 export default function DataGenerator() {
 
-    const [userCount, setUserCount] = useState<number>(0)
+    const [user_count, setUserCount] = useState<number>(0)
     const [deviceCount, setDeviceCount] = useState<number>(0)
     const [gestureCount, setGestureCount] = useState<number>(0)
-    const [logCount, setLogCount] = useState<number>(0)
+    const [log_count, setLogCount] = useState<number>(0)
 
 
-    const [deviceCountRange, setDeviceCountRange] = useState([0, 0]);
-    const [gestureCountRange, setGestureCountRange] = useState([0, 0]);
+    const [device_count_range, setDeviceCountRange] = useState([0, 0]);
+    const [gesture_count_range, setGestureCountRange] = useState([0, 0]);
 
 
     const importData = async (e: SyntheticEvent) => {
         e.preventDefault();
 
-        const response = await fetch('', {
+        const response = await fetch('http://127.0.0.1:8000/db/import', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
-                userCount,
-                deviceCountRange,
-                gestureCountRange,
-                logCount
+                user_count,
+                device_count_range,
+                gesture_count_range,
+                log_count
             })
         });
         if (response.ok) {
@@ -44,7 +44,6 @@ export default function DataGenerator() {
         else {
             const str_numb = e.target.value;
             setDeviceCount(parseInt(str_numb));
-            setDeviceCountRange([0, deviceCount]);
         }
     }
 
@@ -53,7 +52,6 @@ export default function DataGenerator() {
         else {
             const str_numb = e.target.value;
             setGestureCount(parseInt(str_numb));
-            setGestureCountRange([0, gestureCount]);
         }
     }
 
@@ -64,6 +62,11 @@ export default function DataGenerator() {
             setLogCount(parseInt(str_numb));
         }
     }
+
+    useEffect(() => {
+        setDeviceCountRange([0, deviceCount]);
+        setGestureCountRange([0, gestureCount]);
+    }, [deviceCount, gestureCount]);
 
 
     return (
@@ -76,6 +79,7 @@ export default function DataGenerator() {
                     type="number"
                     step="1"
                     className={''}
+                    placeholder={'0'}
                     required={true}
                     onChange={handleUserCount}
                 />
@@ -85,6 +89,7 @@ export default function DataGenerator() {
                     type="number"
                     step="1"
                     className={''}
+                    placeholder={'0'}
                     required={true}
                     onChange={handleDeviceCountRange}
                 />
@@ -94,6 +99,7 @@ export default function DataGenerator() {
                     type="number"
                     step="1"
                     className={''}
+                    placeholder={'0'}
                     required={true}
                     onChange={handleGestureCountRange}
                 />
@@ -103,6 +109,7 @@ export default function DataGenerator() {
                     type="number"
                     step="1"
                     className={''}
+                    placeholder={'0'}
                     required={true}
                     onChange={handleLogCount}
                 />

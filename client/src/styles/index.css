@@ -40,7 +40,7 @@ h1 {
   min-width: 100%;
   display: flex;
   flex-direction: column;
-  margin-bottom: 100px;
+  margin-bottom: 50px;
 }
 
 .website-layout-nav a {
@@ -55,6 +55,7 @@ h1 {
   min-width: 100%;
   display: flex;
   flex-direction: row;
+  margin-top: 25px;
 }
 
 .website-layout-nav-list-div ul {
@@ -75,6 +76,7 @@ h1 {
   justify-content: center;
   border-left: 1px solid #777777;
   border-right: 1px solid #777777;
+  font-size: 20px;
 }
 
 .website-layout-nav-list-div ul li:first-child {
@@ -86,8 +88,8 @@ h1 {
 }
 
 .data-generator-div {
-  width: 400px;
-  padding: 50px 30px;
+  width: 350px;
+  padding: 30px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -101,33 +103,36 @@ h1 {
 }
 
 .data-generator-div form {
-  width: 300px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
 
 .data-generator-div form span {
-  width: 100%;
+  min-width: 100%;
   text-align: center;
-  margin-bottom: 25px;
-  font-size: 24px;
+  margin-bottom: 15px;
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 600;
+  font-style: normal;
 }
 
 .data-generator-div form label {
-  margin-bottom: 10px;
-  font-size: 18px;
+  margin-bottom: 5px;
+  font-size: 16px;
 }
 
 .data-generator-div form input {
   outline: none;
-  margin-bottom: 25px;
-  font-size: 18px;
-  line-height: 24px;
+  margin-bottom: 15px;
+  font-size: 16px;
+  line-height: 20px;
   box-sizing: border-box;
   padding-left: 10px;
   min-width: 100%;
-  height: 40px;
+  height: 32px;
   background-color: #f3edda;
   border: 1px solid #a8ada2;
   border-radius: 4px;
@@ -139,7 +144,7 @@ h1 {
 }
 
 .data-generator-button {
-  margin: 10px 0;
+  margin-top: 10px;
   padding: 10px;
   display: flex;
   justify-content: center;
@@ -163,6 +168,72 @@ h1 {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.delete-data-div {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.select-page-div-content {
+  box-sizing: border-box;
+  min-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.button-options-choose-div {
+  margin-top: 75px;
+  box-sizing: border-box;
+  min-width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.active-button {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f3faff;
+  background-color: #17222c;
+  outline: none;
+  border: none;
+  font-size: 16px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 600;
+  font-style: normal;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.6s ease-in-out;
+}
+
+.no-active-button {
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: whitesmoke;
+  color: #17222c;
+  outline: none;
+  border: none;
+  font-size: 16px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 600;
+  font-style: normal;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.6s ease-in-out;
+}
+.no-active-button:hover {
+  color: #f3faff;
+  background-color: #17222c;
 }
 
 /*# sourceMappingURL=index.css.map */
