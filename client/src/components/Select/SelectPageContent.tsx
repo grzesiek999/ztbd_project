@@ -48,7 +48,7 @@ export default function SelectPageContent() {
                         setDeviceGestureByUserId(false)
                     }}
                     className={usersByUserId ? activeClass : noActiveClass}
-                >SELECT users by user_id</button>
+                >SELECT users by user id</button>
                 <button
                     type={"button"}
                     onClick={() => {
@@ -57,7 +57,7 @@ export default function SelectPageContent() {
                         setDeviceGestureByUserId(false)
                     }}
                     className={deviceByUserId ? activeClass : noActiveClass}
-                >SELECT users devices data by user_id</button>
+                >SELECT users devices data by user id</button>
                 <button
                     type={"button"}
                     onClick={() => {
@@ -66,7 +66,7 @@ export default function SelectPageContent() {
                         setDeviceGestureByUserId(true)
                     }}
                     className={deviceGestureByDeviceId ? activeClass : noActiveClass}
-                >SELECT devices gestures by device_id</button>
+                >SELECT devices gestures by device id</button>
             </div>
             <div style={usersByUserId ? { display: 'flex' } : {display: 'none'}}>
 
