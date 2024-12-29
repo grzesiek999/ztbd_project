@@ -1,4 +1,5 @@
-import {SyntheticEvent, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
+import SampleOrganism from "../General/SampleOrganism.tsx";
 
 
 export default function UpdatePageContent() {
@@ -7,7 +8,7 @@ export default function UpdatePageContent() {
     const [updateDevices, setUpdateDevices] = useState<boolean>(false);
     const [updateGesture, setUpdateGesture] = useState<boolean>(false);
     const [path, setPath] = useState<string>('');
-    const [numberOfAttempts, setNumberOfAttempts] = useState<number | null>(null);
+
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
@@ -22,20 +23,6 @@ export default function UpdatePageContent() {
         else { setPath(''); }
     }, [updateUsers, updateDevices, updateGesture])
 
-    const useUpdate = async (e: SyntheticEvent) => {
-        e.preventDefault();
-
-        const response = await fetch(path, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                numberOfAttempts
-            })
-        });
-        if (response.ok) {
-
-        } else { console.log(response.status, response.statusText); }
-    }
 
     return (
         <div className={"update-page-div-content"}>
@@ -68,15 +55,7 @@ export default function UpdatePageContent() {
                     className={updateGesture ? activeClass : noActiveClass}
                 >UPDATE gesture</button>
             </div>
-            <div style={updateUsers ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
-            <div style={updateDevices ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
-            <div style={updateGesture ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
+            <SampleOrganism path={path} />
         </div>
     )
 }

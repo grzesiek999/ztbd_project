@@ -1,0 +1,98 @@
+.results-organism-div {
+  padding: 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100%;
+}
+
+.results-organism-div span{
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.charts-div {
+  margin-top: 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  min-width: 100%;
+}
+
+.charts-div canvas{
+  width: 600px !important;
+  height: 300px !important;
+}
+
+.tables-div {
+  margin-top: 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  min-width: 100%;
+}
+
+.tableOfData-div {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.table-title-span{
+  font-size: 16px !important;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 600;
+  font-style: normal;
+  margin-bottom: 20px;
+}
+
+.tableOfData-div ul{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tableOfData-div ul li{
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid #555555;
+  border-right: none;
+}
+
+.tableOfData-div ul li:last-child{
+  border-right: 1px solid #555555;
+}
+
+.tableOfData-div ul li p{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  padding: 3px;
+  min-width: 100%;
+  font-size: 12px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.temp {
+  border-bottom: 1px solid #555555;
+}

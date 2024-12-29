@@ -1,0 +1,22 @@
+.sample-organism-div {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+}
+
+.sample-organism-div form {
+  margin-top: 50px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 100%;
+}
+
+.sample-organism-input-container {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+}
+
+/*# sourceMappingURL=sample-organism-div.css.map */
