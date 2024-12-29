@@ -1,5 +1,6 @@
 import LineChart from "./LineChart.tsx";
 import TableOfData from "./TableOfData.tsx";
+import {useEffect, useState} from "react";
 
 type ResultsOrganismProps = {
     postgreTimes: number[],
@@ -9,7 +10,31 @@ type ResultsOrganismProps = {
 
 export default function ResultsOrganism({postgreTimes, mongoTimes}: ResultsOrganismProps) {
 
+    const [postgreAverageTime, setPostgreAverageTime] = useState<number>(0)
+    const [mongoAverageTime, setMongoAverageTime] = useState<number>(0)
 
+    const calculateAverageTimes = () => {
+        let postgreAvg = 0;
+        let mongoAvg = 0;
+
+        for (let item of postgreTimes) {
+            postgreAvg += item;
+        }
+
+        for (let item of mongoTimes) {
+            mongoAvg += item;
+        }
+
+        postgreAvg = postgreAvg / postgreTimes.length;
+        mongoAvg = mongoAvg / mongoTimes.length;
+
+        setPostgreAverageTime(postgreAvg);
+        setMongoAverageTime(mongoAvg);
+    }
+
+    useEffect(()=>{
+        calculateAverageTimes();
+    }, [postgreTimes, mongoTimes])
 
     return (
         <div className="results-organism-div">
@@ -21,6 +46,10 @@ export default function ResultsOrganism({postgreTimes, mongoTimes}: ResultsOrgan
             <div className="charts-div">
                 <LineChart title={'Postgre times'} timesArray={postgreTimes} chartColor={'blue'}/>
                 <LineChart title={'Mongo times'} timesArray={mongoTimes} chartColor={'red'}/>
+            </div>
+            <div className="tables-div">
+                <span>Average time: {postgreAverageTime.toFixed(3)}</span>
+                <span>Average time: {mongoAverageTime.toFixed(3)}</span>
             </div>
         </div>
     )
