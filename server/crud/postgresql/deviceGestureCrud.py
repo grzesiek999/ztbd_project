@@ -34,16 +34,7 @@ def delete_device_gesture(db: Session, dgid: int):
     db.commit()
     return JSONResponse(status_code=200, content={"message": "User gesture deleted"})
 
-def get_device_gestures_by_device_id_list(db: Session, id_list: List[int]):
-    return db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.device_id.in_(id_list)).all()
-
 def delete_devices_gestures_by_gesture_type(db: Session, gesture_type: str):
-    gesture = gestureCrud.get_gesture_by_type(db, gesture_type)
 
-    if not gesture:
-        return JSONResponse(status_code=404, content={"message": "Gesture type not found"})
 
-    db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.gesture_id == gesture.gesture_id).delete(synchronize_session=False)
-    db.commit()
 
-    return JSONResponse(status_code=200, content={"message": "Device gestures deleted"})
