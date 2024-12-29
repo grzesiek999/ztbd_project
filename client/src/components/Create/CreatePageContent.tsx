@@ -1,4 +1,5 @@
-import {SyntheticEvent, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
+import SampleOrganism from "../General/SampleOrganism.tsx";
 
 
 export default function CreatePageContent() {
@@ -7,7 +8,7 @@ export default function CreatePageContent() {
     const [addDevices, setAddDevices] = useState<boolean>(false);
     const [addDevicesGestures, setAddDevicesGestures] = useState<boolean>(false);
     const [path, setPath] = useState<string>('');
-    const [numberOfAttempts, setNumberOfAttempts] = useState<number | null>(null);
+
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
@@ -22,20 +23,6 @@ export default function CreatePageContent() {
         else { setPath(''); }
     }, [addUsers, addDevices, addDevicesGestures])
 
-    const useCreate = async (e: SyntheticEvent) => {
-        e.preventDefault();
-
-        const response = await fetch(path, {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                numberOfAttempts
-            })
-        });
-        if (response.ok) {
-
-        } else { console.log(response.status, response.statusText); }
-    }
 
     return (
         <div className={"create-page-div-content"}>
@@ -68,15 +55,7 @@ export default function CreatePageContent() {
                     className={addDevicesGestures ? activeClass : noActiveClass}
                 >CREATE devices gestures</button>
             </div>
-            <div style={addUsers ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
-            <div style={addDevices ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
-            <div style={addDevicesGestures ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
+            <SampleOrganism path={path} />
         </div>
     )
 }

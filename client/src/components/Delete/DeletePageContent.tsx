@@ -1,4 +1,5 @@
-import {SyntheticEvent, useEffect, useState} from "react";
+import {useEffect, useState} from "react";
+import SampleOrganism from "../General/SampleOrganism.tsx";
 
 
 export default function DeletePageContent() {
@@ -7,9 +8,7 @@ export default function DeletePageContent() {
     const [deleteDeviceByDeviceId, setDeleteDeviceByDeviceId] = useState<boolean>(false);
     const [deleteDeviceGestureByGestureType, setDeleteDeviceGestureByGestureType] = useState<boolean>(false);
     const [path, setPath] = useState<string>('');
-    const id_list: number[] = [];
-    const [gestureType, setGestureType] = useState<string>('');
-    const [dataToSend, setDataToSend] = useState<string | number[]>();
+
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
@@ -18,26 +17,12 @@ export default function DeletePageContent() {
     const deleteDeviceGestureByGestureTypePath = '';
 
     useEffect(() => {
-        if (deleteUsersByUserId) { setPath(deleteUsersByUserIdPath); setDataToSend(id_list); }
-        else if (deleteDeviceByDeviceId) { setPath(deleteDeviceByDeviceIdPath); setDataToSend(id_list); }
-        else if (deleteDeviceGestureByGestureType) { setPath(deleteDeviceGestureByGestureTypePath); setDataToSend(gestureType); }
+        if (deleteUsersByUserId) { setPath(deleteUsersByUserIdPath); }
+        else if (deleteDeviceByDeviceId) { setPath(deleteDeviceByDeviceIdPath); }
+        else if (deleteDeviceGestureByGestureType) { setPath(deleteDeviceGestureByGestureTypePath); }
         else { setPath(''); }
     }, [deleteUsersByUserId, deleteDeviceByDeviceId, deleteDeviceGestureByGestureType])
 
-    const useDelete = async (e: SyntheticEvent) => {
-        e.preventDefault();
-
-        const response = await fetch(path, {
-            method: 'DELETE',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                dataToSend
-            })
-        });
-        if (response.ok) {
-
-        } else { console.log(response.status, response.statusText); }
-    }
 
     return (
         <div className={"delete-page-div-content"}>
@@ -70,15 +55,7 @@ export default function DeletePageContent() {
                     className={deleteDeviceGestureByGestureType ? activeClass : noActiveClass}
                 >DELETE devices gestures by gesture type</button>
             </div>
-            <div style={deleteUsersByUserId ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
-            <div style={deleteDeviceByDeviceId ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
-            <div style={deleteDeviceGestureByGestureType ? { display: 'flex' } : {display: 'none'}}>
-
-            </div>
+            <SampleOrganism path={path} />
         </div>
     )
 }
