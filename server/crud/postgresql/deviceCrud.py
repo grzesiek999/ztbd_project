@@ -51,6 +51,3 @@ def delete_device(db: Session, did: int):
     db.delete(db_device)
     db.commit()
     return JSONResponse(status_code=200, content={"message": "Device deleted"})
-
-def get_devices_by_user_id_list(db: Session, id_list: List[int]):
-    return db.query(deviceModel.Device).filter(deviceModel.Device.user_id.in_(id_list)).all()
