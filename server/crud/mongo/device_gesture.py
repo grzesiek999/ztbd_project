@@ -8,20 +8,6 @@ from schemas.mongo.device_gesture import DeviceGestureOut, DeviceGestureUpdate, 
 import time
 
 
-def find_gestures(db: Database, device_ids: List[str]) -> float:
-    # Add 'list' method - to force the query to execute
-    start = time.time()
-    list(db.devices.find(
-        {"_id": {"$in": [ObjectId(device_id) for device_id in device_ids]}},
-        {"device_gestures": 1, "_id": 0},
-        comment="backend_query"
-    ))
-    end = time.time()
-    query_time = (end - start) * 1000
-    return query_time
-    # return get_last_query_time(db)
-
-
 # TODO: Check if working
 def find_gestures_by_device_ids(db: Database, device_ids: List[str]):
     start = time.time()
@@ -45,7 +31,6 @@ def find_gestures_by_device_ids(db: Database, device_ids: List[str]):
     return query_time
 
 
-# TODO: Check if working
 def find_gestures_by_type(db: Database, gesture_type: str) -> float:
     start = time.time()
     list(db.devices.find(
@@ -76,7 +61,6 @@ def find_gestures_by_type(db: Database, gesture_type: str) -> float:
 #     return get_last_query_time(db)
 
 
-# TODO: Check if working
 def insert_gestures_by_device_type(db: Database, gesture_and_devicetype: BulkDeviceGesturesCreate) -> float:
     gesture_data = gesture_and_devicetype.gesture.model_dump()
     gesture_data["gesture_id"] = str(ObjectId())
