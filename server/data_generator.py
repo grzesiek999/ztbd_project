@@ -4,10 +4,13 @@ import json
 import csv
 import uuid
 from datetime import datetime, timedelta
+import pandas as pd
+from dotenv import load_dotenv
 
 from faker import Faker
 from bson import ObjectId
 
+load_dotenv()
 
 fake = Faker()
 
@@ -117,8 +120,14 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
     device_gestures_id = 0
     log_id = 0
 
+    users_id_map = {'postgres_id': [], 'mongo_id': []}
+    devices_id_map = {'postgres_id': [], 'mongo_id': []}
+
     for user in users_data:
         user_id += 1
+        users_id_map['postgres_id'].append(user_id)
+        users_id_map['mongo_id'].append(user["_id"]["$oid"])
+
         users_csv_data.append(
             [user_id, user["username"], user["email"], user["password_hash"], user["created_at"]["$date"]])
 
@@ -126,6 +135,9 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
 
         for device in devices:
             device_id += 1
+            devices_id_map['postgres_id'].append(device_id)
+            devices_id_map['mongo_id'].append(device["_id"]["$oid"])
+
             devices_csv_data.append(
                 [device_id, device_types.index(device["device_type"]) + 1, device["device_name"], user_id])
 
@@ -159,6 +171,13 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
                     log_id += 1
                     log = [log_id, device_gestures_id, data_log]
                     gesture_logs_csv_data.append(log)
+
+    df_users_id_map = pd.DataFrame(users_id_map)
+    df_devices_id_map = pd.DataFrame(devices_id_map)
+    users_id_map_file = os.getenv("USER_ID_MAP_FILE", "users_id_map.csv")
+    devices_id_map_file = os.getenv("DEVICES_ID_MAP_FILE", "devices_id_map.csv")
+    df_users_id_map.to_csv(users_id_map_file, encoding='utf-8', index=False, header=True)
+    df_devices_id_map.to_csv(devices_id_map_file, encoding='utf-8', index=False, header=True)
 
     return {
         'json': {

@@ -1,12 +1,15 @@
+import os
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from pymongo.database import Database
 from sqlalchemy.orm import Session
+import pandas as pd
 
 from core.mongo.database import get_db as get_mongo_db
 from core.postgresql import database as get_postgresql_db
 from schemas.test import SamplesAndRowsCount, ExecutionTime
 from schemas.postgresql import userSchemas, utils
+from routers.test import utils as test_utils
 
 from crud.mongo.user import find_users as mongo_find_users
 
@@ -21,10 +24,8 @@ def select_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
     samples_count = request.samples_count
     rows_count = request.rows_count
 
-    # TODO: Implement users id generation
-    postgres_users_id = [1, 2, 3]
-    mongo_users_id = ["6772ed6401b43c9a4c9d7e15", "6772ed6401b43c9a4c9d7ddb", "6772ed6401b43c9a4c9d7dfd"]
-
+    user_id_map_df = test_utils.get_users_id_map()
+    postgres_users_id, mongo_users_id = test_utils.get_random_ids(user_id_map_df, rows_count)
     postgres_users_id = utils.IdListRequest(id_list=postgres_users_id)
 
     postgres_times = []
