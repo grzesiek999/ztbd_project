@@ -10,7 +10,6 @@ from typing import List
 import time
 
 
-
 def find_devices(db: Database, user_ids: List[str]) -> float:
     # Add 'list' method - to force the query to execute
     start = time.time()
