@@ -34,16 +34,16 @@ def insert_devices(db: Database, devices: List[DeviceCreate]) -> float:
     # return get_last_query_time(db)
 
 
-# TODO: Check if working
 def update_devices(db: Database, devices_update_data: List[DeviceUpdate]) -> float:
     updates = []
     for device in devices_update_data:
         device_data = device.dict(exclude_unset=True)
         device_id = device_data.pop('id')
+        device_data['owner_id'] = ObjectId(device_data['owner_id'])
         if device_data:
             updates.append(
                 UpdateOne(
-                    {"_id": device_id},
+                    {"_id": ObjectId(device_id)},
                     {"$set": device_data}
                 )
             )

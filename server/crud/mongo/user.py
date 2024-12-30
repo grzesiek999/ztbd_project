@@ -36,7 +36,6 @@ def insert_users(db: Database, users: List[UserCreate]) -> float:
     # return get_last_query_time(db)
 
 
-# TODO: Check if working
 def update_users(db: Database, users_update_data: List[UserUpdate]) -> float:
     updates = []
     for user in users_update_data:
