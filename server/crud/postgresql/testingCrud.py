@@ -30,27 +30,29 @@ def selectUsersTest(request: utils.IdListRequest, db: Session = Depends(database
 
     return query_time
 
-def createUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depends(database.get_db)):
-
+def insertUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depends(database.get_db)):
     if not user_list:
         raise HTTPException(status_code=400, detail="The user_list cannot be empty.")
 
     utilsCrud.reset_sequence(db, "SELECT setval('users_user_id_seq', (SELECT MAX(user_id) FROM users) + 1);")
 
+    bulk_data = [
+        {
+            "username": user.username,
+            "email": user.email.lower(),
+            "password_hash": CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
+        }
+        for user in user_list
+    ]
+
     start = time.time()
 
-    for user in user_list:
-        try:
-            db_user = userModel.User(
-                username=user.username,
-                email=user.email.lower(),
-                password_hash=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
-            )
-            db.add(db_user)
-            db.commit()
-            db.refresh(db_user)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to create user: {str(e)}")
+    try:
+        db.bulk_insert_mappings(userModel.User, bulk_data)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create users: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
@@ -58,29 +60,28 @@ def createUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depen
     return query_time
 
 def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
-
     if not user_list:
         raise HTTPException(status_code=400, detail="The user_list cannot be empty.")
 
+    users_to_update = []
+    for user in user_list:
+        db_user = db.query(userModel.User).filter(userModel.User.user_id == user.user_id).first()
+        if not db_user:
+            raise HTTPException(status_code=400, detail=f"User with id {user.user_id} not found")
+
+        db_user.username = user.username
+        db_user.email = user.email.lower()
+        db_user.password_hash = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
+        users_to_update.append(db_user)
+
     start = time.time()
 
-    for user in user_list:
-        try:
-            db_user = db.query(userModel.User).filter(userModel.User.user_id == user.user_id).first()
-            try:
-                if user.username is not None:
-                    db_user.username = user.username
-                if user.email is not None:
-                    db_user.email = user.email.lower()
-                if user.password_hash is not None:
-                    db_user.password_hash = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
-                db.commit()
-                db.refresh(db_user)
-            except Exception as e:
-                db.rollback()
-                raise HTTPException(status_code=500, detail=f"Failed to update user: {str(e)}")
-        except Exception as err:
-            raise HTTPException(status_code=400, detail=f"Failed to find user: {str(err)}")
+    try:
+        db.bulk_save_objects(users_to_update)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update users: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
@@ -95,12 +96,12 @@ def deleteUsersTest(request: utils.IdListRequest, db: Session = Depends(database
 
     start = time.time()
 
-    for uid in id_list:
-        try:
-            db.delete(db.query(userModel.User).filter(userModel.User.user_id == uid).first())
-            db.commit()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
+    try:
+        db.query(userModel.User).filter(userModel.User.user_id.in_(id_list)).delete(synchronize_session=False)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to delete users: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
@@ -128,28 +129,29 @@ def selectDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
 
     return query_time
 
-def createDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session = Depends(database.get_db)):
-
+def insertDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session = Depends(database.get_db)):
     if not device_list:
         raise HTTPException(status_code=400, detail="The device_list cannot be empty.")
 
     utilsCrud.reset_sequence(db, "SELECT setval('devices_device_id_seq', (SELECT MAX(device_id) FROM devices) + 1);")
 
+    bulk_data = [
+        {
+            "device_name": device.device_name.lower(),
+            "device_type_id": device.device_type_id,
+            "user_id": device.user_id
+        }
+        for device in device_list
+    ]
+
     start = time.time()
 
-    for device in device_list:
-        try:
-            db_device = deviceModel.Device(
-                device_name=device.device_name.lower(),
-                device_type_id=device.device_type_id,
-                user_id=device.user_id
-            )
-
-            db.add(db_device)
-            db.commit()
-            db.refresh(db_device)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to create device: {str(e)}")
+    try:
+        db.bulk_insert_mappings(deviceModel.Device, bulk_data)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to create devices: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
@@ -157,27 +159,27 @@ def createDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session
     return query_time
 
 def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session = Depends(database.get_db)):
-
     if not device_list:
         raise HTTPException(status_code=400, detail="The device_list cannot be empty.")
 
+    devices_to_update = []
+    for device in device_list:
+        db_device = db.query(deviceModel.Device).filter(deviceModel.Device.device_id == device.device_id).first()
+        if not db_device:
+            raise HTTPException(status_code=400, detail=f"Device with id {device.device_id} not found")
+
+        db_device.device_name = device.device_name.lower()
+        db_device.device_type_id = device.device_type_id
+        devices_to_update.append(db_device)
+
     start = time.time()
 
-    for device in device_list:
-        try:
-            db_device = db.query(deviceModel.Device).filter(deviceModel.Device.device_id == device.device_id).first()
-            try:
-                if device.device_name is not None:
-                    db_device.device_name = device.device_name.lower()
-                if device.device_type_id is not None:
-                    db_device.device_type_id = device.device_type_id
-                db.commit()
-                db.refresh(db_device)
-            except Exception as e:
-                db.rollback()
-                raise HTTPException(status_code=500, detail=f"Failed to update device: {str(e)}")
-        except Exception as err:
-            raise HTTPException(status_code=400, detail=f"Failed to find device: {str(err)}")
+    try:
+        db.bulk_save_objects(devices_to_update)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update devices: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
@@ -192,12 +194,12 @@ def deleteDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
 
     start = time.time()
 
-    for did in id_list:
-        try:
-            db.delete(db.query(deviceModel.Device).filter(deviceModel.Device.device_id == did).first())
-            db.commit()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to delete user: {str(e)}")
+    try:
+        db.query(deviceModel.Device).filter(deviceModel.Device.device_id.in_(id_list)).delete(synchronize_session=False)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to delete devices: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
@@ -206,6 +208,56 @@ def deleteDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
 
 
 # DeviceGestures queries to test
+
+def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session = Depends(database.get_db)):
+    if not gesture:
+        raise HTTPException(status_code=400, detail="The gesture cannot be empty.")
+
+    db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
+
+    start = time.time()
+
+    try:
+        db_gesture.description = gesture.description
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to update gesture: {str(e)}")
+
+    end = time.time()
+    query_time = (end - start) * 1000
+
+    return query_time
+
+def deleteGestureTest(gesture_type: str, db: Session = Depends(database.get_db)):
+    if not gesture_type:
+        raise HTTPException(status_code=400, detail="The gesture_type cannot be empty.")
+
+    start = time.time()
+
+    try:
+        db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type==gesture_type).delete(synchronize_session=False)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Failed to delete devices: {str(e)}")
+
+    end = time.time()
+    query_time = (end - start) * 1000
+
+    return query_time
+
+
+
+
+
+
+
+
+
+
+
+
 
 def selectDeviceGesturesTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
     id_list = request.id_list
@@ -224,7 +276,7 @@ def selectDeviceGesturesTest(request: utils.IdListRequest, db: Session = Depends
     query_time = (end - start) * 1000
 
     return query_time
-'''
+
 def createDeviceGesturesTest(device_gesture_list: List[deviceGestureSchemas.DeviceGestureCreate], db: Session = Depends(database.get_db)):
 
     if not device_gesture_list:
@@ -239,53 +291,6 @@ def createDeviceGesturesTest(device_gesture_list: List[deviceGestureSchemas.Devi
             deviceGestureCrud.create_device_gesture(db, device_gesture)
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to create device gesture: {str(e)}")
-
-    end = time.time()
-    query_time = (end - start) * 1000
-
-    return query_time
-'''
-def deleteDeviceGesturesTest(gesture_type: str, db: Session = Depends(database.get_db)):
-
-    if not gesture_type:
-        raise HTTPException(status_code=400, detail="The gesture_type cannot be empty.")
-
-    start = time.time()
-
-    try:
-        gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture_type).first()
-        try:
-            db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.gesture_id == gesture.gesture_id).delete(synchronize_session=False)
-            db.commit()
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to delete device gesture: {str(e)}")
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=f"Failed to find gesture: {str(err)}")
-
-    end = time.time()
-    query_time = (end - start) * 1000
-
-    return query_time
-
-def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session = Depends(database.get_db)):
-
-    if not gesture:
-        raise HTTPException(status_code=400, detail="The gesture cannot be empty.")
-
-    start = time.time()
-
-    try:
-        db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
-        try:
-            if gesture.description is not None:
-                db_gesture.description = gesture.description
-            db.commit()
-            db.refresh(db_gesture)
-        except Exception as e:
-            db.rollback()
-            raise HTTPException(status_code=500, detail=f"Failed to update gesture: {str(e)}")
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=f"Failed to find gesture: {str(err)}")
 
     end = time.time()
     query_time = (end - start) * 1000
