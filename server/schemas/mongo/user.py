@@ -19,7 +19,7 @@ class UserCreate(UserBase):
 
 class UserOut(UserBase):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    created_at: datetime
+    created_at: datetime = Field(..., examples=[datetime.now()])
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -28,15 +28,21 @@ class UserOut(UserBase):
 
 
 class UserUpdate(BaseModel):
+    id: PyObjectId = Field(alias="_id", default=None)
     username: Optional[str] = Field(..., examples=["Foo"])
     email: Optional[EmailStr] = Field(..., examples=["johndoe@example.com"])
     password_hash: Optional[str] = Field(..., examples=["hashedpassword123"])
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 
 class UserIDsRequest(BaseModel):
     user_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
 
 
-class BulkUserUpdate(BaseModel):
-    user_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
-    update_data: UserUpdate
+# class BulkUserUpdate(BaseModel):
+#     user_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
+#     update_data: List[UserUpdate]

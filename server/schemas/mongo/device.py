@@ -11,9 +11,9 @@ PyObjectId = Annotated[str, BeforeValidator(str)]
 
 class DeviceBase(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    device_type: str
-    device_name: str
-    owner_id: PyObjectId
+    device_type: str = Field(..., examples=["Light"])
+    device_name: str = Field(..., examples=["Light 1"])
+    owner_id: PyObjectId = Field(..., examples=["60a5e2e3b8d5f6b8e3f8e5f6"])
 
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
@@ -24,7 +24,7 @@ class DeviceBase(BaseModel):
 class DeviceCreate(BaseModel):
     device_type: str = Field(..., examples=["Light"])
     device_name: str = Field(..., examples=["Light 1"])
-    device_gestures: List[DeviceGestureBase] = Field(default_factory=list)
+    # device_gestures: List[DeviceGestureBase] = Field(default_factory=list)
     owner_id: PyObjectId = Field(..., examples=["60a5e2e3b8d5f6b8e3f8e5f6"])
 
     model_config = ConfigDict(
@@ -34,8 +34,15 @@ class DeviceCreate(BaseModel):
 
 
 class DeviceUpdate(BaseModel):
+    id: PyObjectId = Field(alias="_id", default=None)
     device_type: Optional[str] = Field(None, examples=["Light"])
     device_name: Optional[str] = Field(None, examples=["Light 1"])
+    owner_id: Optional[PyObjectId]
+
+    model_config = ConfigDict(
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
 
 
 class DeviceOut(DeviceBase):
@@ -50,6 +57,6 @@ class UserIDsRequest(BaseModel):
     user_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
 
 
-class BulkDeviceUpdate(BaseModel):
-    device_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
-    update_data: DeviceUpdate
+# class BulkDeviceUpdate(BaseModel):
+#     device_ids: List[str] = Field(..., examples=[["60a5e2e3b8d5f6b8e3f8e5f6", "60a5e2e3b8d5f6b8e3f8e5f7"]])
+#     update_data: DeviceUpdate
