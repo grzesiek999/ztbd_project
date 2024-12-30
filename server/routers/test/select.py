@@ -25,7 +25,7 @@ def select_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
     postgres_users_id = [1, 2, 3]
     mongo_users_id = ["6772ed6401b43c9a4c9d7e15", "6772ed6401b43c9a4c9d7ddb", "6772ed6401b43c9a4c9d7dfd"]
 
-    postgres_users_id = utils.IdListRequest(ids=postgres_users_id)
+    postgres_users_id = utils.IdListRequest(id_list=postgres_users_id)
 
     postgres_times = []
     mongo_times = []
