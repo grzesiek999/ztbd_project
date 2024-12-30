@@ -58,6 +58,7 @@ services:
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_SSH_USERNAME=${MONGO_SSH_USERNAME}
       - MONGO_SSH_PASSWORD=${MONGO_SSH_PASSWORD}
+      - MONGO_CONTAINER_NAME=${MONGO_CONTAINER_NAME}
     command: ["python", "main.py"]
     depends_on:
       - mongo
@@ -87,6 +88,7 @@ services:
       - MONGO_PASSWORD=${MONGO_PASSWORD}
       - MONGO_SSH_USERNAME=${MONGO_SSH_USERNAME}
       - MONGO_SSH_PASSWORD=${MONGO_SSH_PASSWORD}
+      - MONGO_CONTAINER_NAME=${MONGO_CONTAINER_NAME}
     command: ["python", "main.py"]
     depends_on:
       - mongo

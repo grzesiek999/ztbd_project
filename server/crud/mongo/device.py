@@ -9,8 +9,6 @@ from schemas.mongo.device import DeviceCreate, DeviceUpdate
 from typing import List
 import time
 
-from server.data_generator import device_types
-
 
 def find_devices(db: Database, user_ids: List[str]) -> float:
     # Add 'list' method - to force the query to execute
