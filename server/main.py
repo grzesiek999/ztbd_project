@@ -11,6 +11,7 @@ from routers.mongo import user as mongo_user_router
 from routers.mongo import device as mongo_device_router
 from routers.mongo import device_gesture as mongo_device_gesture_router
 from routers.mongo import log as mongo_gesture_log_router
+from routers.test import select as test_select_router
 from core.mongo.database import connect_to_mongo, close_mongo_connection
 from core.postgresql.database import connect_to_postgres, close_postgres_connection
 
@@ -65,6 +66,8 @@ app.include_router(mongo_device_router.router, prefix="/mongo/devices", tags=["M
 app.include_router(mongo_device_gesture_router.router, prefix="/mongo/device_gestures", tags=["Mongo device_gestures"])
 app.include_router(mongo_gesture_log_router.router, prefix="/mongo/gesture_logs", tags=["Mongo gesture_logs"])
 app.include_router(import_data_router, prefix="/db", tags=["import_data"])
+
+app.include_router(test_select_router.router, prefix="/test/select", tags=["Test SELECT"])
 
 
 if __name__ == "__main__":

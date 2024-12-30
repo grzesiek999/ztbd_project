@@ -32,6 +32,10 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
         log_count=request.log_count
     )
 
+    return drop_and_import_data(db_postgre)
+
+
+def drop_and_import_data(db_postgre: Session = Depends(database.get_db)):
     mongo_import()
     run_postgre_import(db_postgre)
 
