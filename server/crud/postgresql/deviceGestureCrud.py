@@ -34,7 +34,7 @@ def delete_device_gesture(db: Session, dgid: int):
     db.commit()
     return JSONResponse(status_code=200, content={"message": "User gesture deleted"})
 
-def delete_devices_gestures_by_gesture_type(db: Session, gesture_type: str):
-
-
+# def delete_devices_gestures_by_gesture_type(db: Session, gesture_type: str):
+#
+#
 

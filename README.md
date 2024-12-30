@@ -3,12 +3,12 @@
 ## 1) Setup
 ### MongoDB
 1. Run docker-compose up
-2. Run in terminal
-<br>a) Enter mongosh:
+2. Set profiler:<br>
+    a) Enter mongosh:
     ```
     docker exec -it [CONTAINER_ID] mongosh
     ```
-    c) Set profiler:<br>
+    b) Set profiler:<br>
     ```
     use admin
     ```
@@ -21,6 +21,15 @@
     ```
     db.setProfilingLevel(1, { slowms: 0, filter: { "command.comment": "backend_query" } })
     ```
+
+   a) Set SSH:
+    ```
+    docker exec -it [CONTAINER_ID] bin/bash
+    ```
+    ```
+    service ssh start
+    ```
+    
    
 ### 2) Run Docker
 1. Run docker-compose up<br>
