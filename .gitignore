@@ -3,6 +3,7 @@
 server/data
 /mongo_data
 /postgres_data
+*.csv
 
 *__pycache__
 *.py[cod]
