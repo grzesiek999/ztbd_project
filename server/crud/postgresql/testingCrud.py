@@ -209,6 +209,35 @@ def deleteDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
 
 # DeviceGestures queries to test
 
+def selectDeviceGesturesTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
+    id_list = request.id_list
+
+    if not id_list:
+        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
+
+    start = time.time()
+
+    try:
+        db.query(
+            deviceGestureModel.DeviceGesture.device_gesture_id,
+            deviceGestureModel.DeviceGesture.device_id,
+            deviceGestureModel.DeviceGesture.gesture_name,
+            gestureModel.Gesture.gesture_id,
+            gestureModel.Gesture.gesture_type,
+            gestureModel.Gesture.description
+        ).join(
+            gestureModel.Gesture, deviceGestureModel.DeviceGesture.gesture_id == gestureModel.Gesture.gesture_id
+        ).filter(
+            deviceGestureModel.DeviceGesture.device_id.in_(id_list)
+        ).all()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch device gestures: {str(e)}")
+
+    end = time.time()
+    query_time = (end - start) * 1000
+
+    return query_time
+
 def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session = Depends(database.get_db)):
     if not gesture:
         raise HTTPException(status_code=400, detail="The gesture cannot be empty.")
@@ -257,26 +286,6 @@ def deleteGestureTest(gesture_type: str, db: Session = Depends(database.get_db))
 
 
 
-
-
-def selectDeviceGesturesTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
-    id_list = request.id_list
-
-    if not id_list:
-        raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
-
-    start = time.time()
-
-    try:
-        db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.device_id.in_(id_list)).all()
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to find device gesture: {str(e)}")
-
-    end = time.time()
-    query_time = (end - start) * 1000
-
-    return query_time
-
 def createDeviceGesturesTest(device_gesture_list: List[deviceGestureSchemas.DeviceGestureCreate], db: Session = Depends(database.get_db)):
 
     if not device_gesture_list:
@@ -286,11 +295,9 @@ def createDeviceGesturesTest(device_gesture_list: List[deviceGestureSchemas.Devi
 
     start = time.time()
 
-    for device_gesture in device_gesture_list:
-        try:
-            deviceGestureCrud.create_device_gesture(db, device_gesture)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Failed to create device gesture: {str(e)}")
+    try:
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to create device gesture: {str(e)}")
 
     end = time.time()
     query_time = (end - start) * 1000
