@@ -25,6 +25,7 @@ router = APIRouter()
 
 @router.post("/import")
 def import_data(request: ImportRequest, db_postgre: Session = Depends(database.get_db)):
+    """ Generate data and import it into the databases """
     generate_data_and_export(
         user_count=request.user_count,
         device_count_range=request.device_count_range,
@@ -36,23 +37,18 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
 
 
 def drop_and_import_data(db_postgre: Session = Depends(database.get_db)):
+    """ Drop all data from the databases and import the generated data """
     mongo_import()
+    delete_data(db_postgre)
     run_postgre_import(db_postgre)
 
     return {"message": "Data imported successfully"}
 
 
-@router.post("/delete")
-def delete_data(db: Database = Depends(get_db), db_postgre: Session = Depends(database.get_db)):
+# @router.post("/delete")
+def delete_data(db_postgre: Session = Depends(database.get_db)):
     try:
-        collections = db.list_collection_names()
-
-        for collection_name in collections:
-            if collection_name != "system.profile":
-                db[collection_name].delete_many({})
-
         clear_postgre(db_postgre)
-
         return {"message": "All data deleted successfully"}
 
     except Exception as e:
@@ -98,23 +94,6 @@ def run_mongoimport_file(mongo_uri: str, db_name: str, file_path: str, ssh_clien
         print(f"Error importing data into {db_name}.{collection_name}, error: {error}")
     else:
         print(f"Data imported successfully into {db_name}.{collection_name}")
-
-    # mongoimport_command = [
-    #     "mongoimport",
-    #     "--uri", mongo_uri,
-    #     "--db", db_name,
-    #     "--collection", collection_name,
-    #     "--file", file_path,
-    #     "--jsonArray",
-    #     "--drop"
-    # ]
-    #
-    # result = subprocess.run(mongoimport_command, capture_output=True, text=True)
-    #
-    # if result.returncode == 0:
-    #     print(f"Data imported successfully into {db_name}.{collection_name}")
-    # else:
-    #     print(f"Error importing data: {result.stderr}")
 
 
 def run_postgre_import(db: Session):

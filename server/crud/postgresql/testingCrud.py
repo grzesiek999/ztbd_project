@@ -30,22 +30,26 @@ def selectUsersTest(request: utils.IdListRequest, db: Session = Depends(database
 
     return query_time
 
-def createUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depends(database.get_db)):
 
+def createUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depends(database.get_db)):
     if not user_list:
         raise HTTPException(status_code=400, detail="The user_list cannot be empty.")
 
     utilsCrud.reset_sequence(db, "SELECT setval('users_user_id_seq', (SELECT MAX(user_id) FROM users) + 1);")
 
+    db_users = []
+    for user in user_list:
+        db_user = userModel.User(
+            username=user.username,
+            email=user.email,
+            password_hash=user.password_hash
+        )
+        db_users.append(db_user)
+
     start = time.time()
 
-    for user in user_list:
+    for db_user in db_users:
         try:
-            db_user = userModel.User(
-                username=user.username,
-                email=user.email.lower(),
-                password_hash=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
-            )
             db.add(db_user)
             db.commit()
             db.refresh(db_user)
@@ -57,8 +61,8 @@ def createUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depen
 
     return query_time
 
-def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
 
+def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depends(database.get_db)):
     if not user_list:
         raise HTTPException(status_code=400, detail="The user_list cannot be empty.")
 
@@ -71,9 +75,9 @@ def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depen
                 if user.username is not None:
                     db_user.username = user.username
                 if user.email is not None:
-                    db_user.email = user.email.lower()
+                    db_user.email = user.email
                 if user.password_hash is not None:
-                    db_user.password_hash = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
+                    db_user.password_hash = user.password_hash
                 db.commit()
                 db.refresh(db_user)
             except Exception as e:
@@ -86,6 +90,7 @@ def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depen
     query_time = (end - start) * 1000
 
     return query_time
+
 
 def deleteUsersTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
     id_list = request.id_list
@@ -128,23 +133,26 @@ def selectDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
 
     return query_time
 
-def createDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session = Depends(database.get_db)):
 
+def createDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session = Depends(database.get_db)):
     if not device_list:
         raise HTTPException(status_code=400, detail="The device_list cannot be empty.")
 
     utilsCrud.reset_sequence(db, "SELECT setval('devices_device_id_seq', (SELECT MAX(device_id) FROM devices) + 1);")
 
+    db_devices = []
+    for device in device_list:
+        db_device = deviceModel.Device(
+            device_name=device.device_name,
+            device_type_id=device.device_type_id,
+            user_id=device.user_id
+        )
+        db_devices.append(db_device)
+
     start = time.time()
 
-    for device in device_list:
+    for db_device in db_devices:
         try:
-            db_device = deviceModel.Device(
-                device_name=device.device_name.lower(),
-                device_type_id=device.device_type_id,
-                user_id=device.user_id
-            )
-
             db.add(db_device)
             db.commit()
             db.refresh(db_device)
@@ -156,8 +164,8 @@ def createDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session
 
     return query_time
 
-def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session = Depends(database.get_db)):
 
+def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session = Depends(database.get_db)):
     if not device_list:
         raise HTTPException(status_code=400, detail="The device_list cannot be empty.")
 
@@ -183,6 +191,7 @@ def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session
     query_time = (end - start) * 1000
 
     return query_time
+
 
 def deleteDevicesTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
     id_list = request.id_list
@@ -224,6 +233,8 @@ def selectDeviceGesturesTest(request: utils.IdListRequest, db: Session = Depends
     query_time = (end - start) * 1000
 
     return query_time
+
+
 '''
 def createDeviceGesturesTest(device_gesture_list: List[deviceGestureSchemas.DeviceGestureCreate], db: Session = Depends(database.get_db)):
 
@@ -245,8 +256,9 @@ def createDeviceGesturesTest(device_gesture_list: List[deviceGestureSchemas.Devi
 
     return query_time
 '''
-def deleteDeviceGesturesTest(gesture_type: str, db: Session = Depends(database.get_db)):
 
+
+def deleteDeviceGesturesTest(gesture_type: str, db: Session = Depends(database.get_db)):
     if not gesture_type:
         raise HTTPException(status_code=400, detail="The gesture_type cannot be empty.")
 
@@ -255,7 +267,8 @@ def deleteDeviceGesturesTest(gesture_type: str, db: Session = Depends(database.g
     try:
         gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture_type).first()
         try:
-            db.query(deviceGestureModel.DeviceGesture).filter(deviceGestureModel.DeviceGesture.gesture_id == gesture.gesture_id).delete(synchronize_session=False)
+            db.query(deviceGestureModel.DeviceGesture).filter(
+                deviceGestureModel.DeviceGesture.gesture_id == gesture.gesture_id).delete(synchronize_session=False)
             db.commit()
         except Exception as e:
             raise HTTPException(status_code=500, detail=f"Failed to delete device gesture: {str(e)}")
@@ -267,15 +280,16 @@ def deleteDeviceGesturesTest(gesture_type: str, db: Session = Depends(database.g
 
     return query_time
 
-def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session = Depends(database.get_db)):
 
+def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session = Depends(database.get_db)):
     if not gesture:
         raise HTTPException(status_code=400, detail="The gesture cannot be empty.")
 
     start = time.time()
 
     try:
-        db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
+        db_gesture = db.query(gestureModel.Gesture).filter(
+            gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
         try:
             if gesture.description is not None:
                 db_gesture.description = gesture.description

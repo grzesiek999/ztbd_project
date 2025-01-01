@@ -32,19 +32,67 @@ gestures = [
 device_types = ["Light", "Appliance", "Camera", "Thermostat"]
 
 
+def generate_unique_email():
+    email_prefix = fake.user_name() + str(uuid.uuid4())
+    email_domain = fake.free_email_domain()
+    email = f"{email_prefix}@{email_domain}"
+    return email
+
+
+def generate_user():
+    username = fake.user_name()
+    email = generate_unique_email()
+    password_hash = fake.sha256()
+    created_at = fake.date_time_this_decade().isoformat(timespec="seconds") + "Z"
+    user = {
+        "username": username,
+        "email": email,
+        "password_hash": password_hash,
+        "created_at": created_at
+    }
+    return user
+
+
+def generate_device(owner_id):
+    device_name = fake.word()
+    device_type = random.choice(device_types)
+    device = {
+        "device_name": device_name,
+        "device_type": device_type,
+        "device_type_id": device_types.index(device_type) + 1,
+        "owner_id": owner_id
+    }
+    return device
+
+
+def generate_device_gesture():
+    gesture = random.choice(gestures)
+    gesture = {
+        "gesture_type": gesture["gesture_type"],
+        "gesture_name": fake.word(),
+        "gesture_description": gesture["description"]
+    }
+    return gesture
+
+
+def generate_device_type():
+    device_type = random.choice(device_types)
+    return device_type
+
+
+def generate_gesture():
+    gesture = random.choice(gestures)
+    return gesture
+
+
 # Funkcja generująca dane użytkowników
 def generate_users_with_devices(user_count, device_types, gestures_list,
                                 device_count_range, gesture_count_range):
     devices = []
     users = []
 
-    def generate_unique_email():
-        email_prefix = fake.user_name() + str(uuid.uuid4())
-        email_domain = fake.free_email_domain()
-        email = f"{email_prefix}@{email_domain}"
-        return email
-
     for _ in range(user_count):
+        user = generate_user()
         user_id = str(ObjectId())
         user_devices = generate_devices_with_gestures(user_id, device_types=device_types, gestures_list=gestures_list,
                                                       device_count_range=device_count_range,
@@ -54,11 +102,11 @@ def generate_users_with_devices(user_count, device_types, gestures_list,
             "_id": {
                 "$oid": user_id,
             },
-            "username": fake.user_name(),
-            "email": generate_unique_email(),
-            "password_hash": fake.sha256(),
+            "username": user["username"],
+            "email": user["email"],
+            "password_hash": user["password_hash"],
             "created_at": {
-                "$date": fake.date_time_this_decade().isoformat(timespec="seconds")+"Z",
+                "$date": user["created_at"],
             }
         }
         users.append(user)
@@ -70,17 +118,18 @@ def generate_devices_with_gestures(user_id, device_types, gestures_list,
                                    device_count_range, gesture_count_range):
     devices = []
     for _ in range(random.randint(*device_count_range)):  # Liczba urządzeń dla użytkownika
-        device_type = random.choice(device_types)
+        device = generate_device(user_id)
+        # device_type = random.choice(device_types)
         device = {
             "_id": {
-                "$oid": str(ObjectId())
+                "$oid": str(ObjectId()),
             },
-            "device_name": fake.word(),
-            "device_type": device_type,
+            "device_name": device["device_name"],
+            "device_type": device["device_type"],
             "device_gestures": generate_device_gestures(gestures_list, gesture_count_range),
             # Gesty przypisane do urządzenia
             "owner_id": {
-                "$oid": user_id
+                "$oid": device["owner_id"],
             }
         }
         devices.append(device)
@@ -149,7 +198,8 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
 
                 # Generowanie logów
                 for _ in range(logs_count):
-                    data_log = (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat(timespec="seconds")+"Z"
+                    data_log = (datetime.now() - timedelta(days=random.randint(0, 365))).isoformat(
+                        timespec="seconds") + "Z"
                     # Generowanie logów do MongoDB
                     log = {
                         "_id": {
@@ -176,8 +226,10 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
     df_devices_id_map = pd.DataFrame(devices_id_map)
     users_id_map_file = os.getenv("USER_ID_MAP_FILE", "users_id_map.csv")
     devices_id_map_file = os.getenv("DEVICES_ID_MAP_FILE", "devices_id_map.csv")
-    df_users_id_map.to_csv(users_id_map_file, encoding='utf-8', index=False, header=True)
-    df_devices_id_map.to_csv(devices_id_map_file, encoding='utf-8', index=False, header=True)
+    data_dir = os.getenv("DATA_DIR", "data")
+    os.makedirs(f"/{data_dir}", exist_ok=True)
+    df_users_id_map.to_csv(f"/{data_dir}/{users_id_map_file}", encoding='utf-8', index=False, header=True)
+    df_devices_id_map.to_csv(f"/{data_dir}/{devices_id_map_file}", encoding='utf-8', index=False, header=True)
 
     return {
         'json': {
@@ -195,9 +247,11 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
 
 
 def generate_data(user_count, device_types, gestures_list,
-                                device_count_range, gesture_count_range, log_count):
-    users_data_json, devices_data_json = generate_users_with_devices(user_count=user_count, device_types=device_types, gestures_list=gestures_list,
-                                device_count_range=device_count_range, gesture_count_range=gesture_count_range)
+                  device_count_range, gesture_count_range, log_count):
+    users_data_json, devices_data_json = generate_users_with_devices(user_count=user_count, device_types=device_types,
+                                                                     gestures_list=gestures_list,
+                                                                     device_count_range=device_count_range,
+                                                                     gesture_count_range=gesture_count_range)
     data = generate_postgres_csv_data(users_data_json, devices_data_json, logs_count=log_count)
 
     data['json']['users'] = users_data_json
@@ -243,13 +297,12 @@ def export_data(data):
 
 
 def generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
-                                device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE,
-                                log_count=LOG_COUNT):
+                             device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE,
+                             log_count=LOG_COUNT):
     data = generate_data(user_count=user_count, device_types=device_types, gestures_list=gestures_list,
-                                device_count_range=device_count_range, gesture_count_range=gesture_count_range,
-                                log_count=log_count)
+                         device_count_range=device_count_range, gesture_count_range=gesture_count_range,
+                         log_count=log_count)
     export_data(data)
-
 
 # generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
 #                                  device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)
