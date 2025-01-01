@@ -17,7 +17,7 @@ from routers.db_data import drop_and_import_data
 from crud.mongo.user import delete_users as mongo_delete_users
 from crud.mongo.device import delete_devices as mongo_delete_devices
 from crud.mongo.device_gesture import delete_gestures_by_type as mongo_delete_gestures
-from crud.postgresql.testingCrud import deleteUsersTest, deleteDevicesTest, deleteDeviceGesturesTest
+from crud.postgresql.testingCrud import deleteUsersTest, deleteDevicesTest, deleteGestureTest
 
 router = APIRouter()
 
@@ -87,7 +87,7 @@ def delete_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mong
     for i in range(samples_count):
         mongo_time = mongo_delete_gestures(mongo_db, mongo_gesture)
         mongo_times.append(mongo_time)
-        postgres_time = deleteDeviceGesturesTest(postgres_gesture, postgresql_db)
+        postgres_time = deleteGestureTest(postgres_gesture, postgresql_db)
         postgres_times.append(postgres_time)
 
         drop_and_import_data(postgresql_db)

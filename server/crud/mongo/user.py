@@ -14,7 +14,7 @@ def find_users(db: Database, user_ids: List[str]) -> float:
     start = time.time()
     # Add 'list' method - to force the query to execute
     users = list(db.users.find({"_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}},
-                       comment="backend_query"))
+                               comment="backend_query"))
     end = time.time()
     query_time = (end - start) * 1000
     return query_time
@@ -61,7 +61,9 @@ def update_users(db: Database, users_update_data: List[UserUpdate]) -> float:
 def delete_users(db: Database, user_ids: List[str]) -> float:
     start = time.time()
     users = db.users.delete_many({"_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}},
-                         comment="backend_query")
+                                 comment="backend_query")
+    devices = db.devices.delete_many({"owner_id": {"$in": [ObjectId(user_id) for user_id in user_ids]}},
+                                     comment="backend_query")
     end = time.time()
     query_time = (end - start) * 1000
     return query_time
