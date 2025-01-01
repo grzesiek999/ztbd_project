@@ -11,3 +11,4 @@ Faker
 python-dotenv
 greenlet
 paramiko
+pandas
