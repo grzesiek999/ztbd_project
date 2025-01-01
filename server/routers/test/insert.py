@@ -18,7 +18,7 @@ from routers.db_data import drop_and_import_data
 from crud.mongo.user import insert_users as mongo_insert_users
 from crud.mongo.device import insert_devices as mongo_insert_devices
 from crud.mongo.device_gesture import insert_gestures_by_device_type as mongo_insert_device_gestures
-from crud.postgresql.testingCrud import createUsersTest, createDevicesTest
+from crud.postgresql.testingCrud import insertUsersTest, insertDevicesTest
 
 router = APIRouter()
 
@@ -44,7 +44,7 @@ def insert_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
     for i in range(samples_count):
         mongo_time = mongo_insert_users(mongo_db, mongo_users)
         mongo_times.append(mongo_time)
-        postgres_time = createUsersTest(postgres_users, postgresql_db)
+        postgres_time = insertUsersTest(postgres_users, postgresql_db)
         postgres_times.append(postgres_time)
 
         drop_and_import_data(postgresql_db)
@@ -83,7 +83,7 @@ def insert_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
     for i in range(samples_count):
         mongo_time = mongo_insert_devices(mongo_db, mongo_devices)
         mongo_times.append(mongo_time)
-        postgres_time = createDevicesTest(postgres_devices, postgresql_db)
+        postgres_time = insertDevicesTest(postgres_devices, postgresql_db)
         postgres_times.append(postgres_time)
 
         drop_and_import_data(postgresql_db)
