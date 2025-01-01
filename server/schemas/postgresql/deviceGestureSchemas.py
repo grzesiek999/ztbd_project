@@ -21,3 +21,8 @@ class DeviceGesture(DeviceGestureBase):
 
     class Config:
         from_attributes = True
+
+class DeviceGestureCreateTest(BaseModel):
+    device_type_name: str
+    gesture_name: str
+    gesture_id: int
