@@ -8,21 +8,22 @@ type SampleOrganismProps = {
 
 export default function SampleOrganism({path}: SampleOrganismProps) {
 
-    const [sampleNumber, setSampleNumber] = useState<number>(0);
-    const [idListSize, setIdListSize] = useState<number>(0);
+    const [samples_count, set_samples_count] = useState<number>(0);
+    const [rows_count, set_rows_count] = useState<number>(0);
     const [postgreTimes, setPostgreTimes] = useState<number[]>([]);
     const [mongoTimes, setMongoTimes] = useState<number[]>([]);
+    const [sendData, setSendData] = useState<{}>({});
 
-    const useSelect = async (e: SyntheticEvent) => {
-        e.preventDefault();
+    const useQuery = async () => {
+        setSendData({
+            samples_count: samples_count !== 0 ? samples_count : null,
+            rows_count: rows_count !== 0 ? rows_count : null,
+        })
 
         const response = await fetch(path, {
-            method: 'POST',
+            method: `POST`,
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                sampleNumber,
-                idListSize
-            })
+            body: JSON.stringify(sendData)
         });
         if (response.ok) {
             const data = await response.json();
@@ -32,38 +33,26 @@ export default function SampleOrganism({path}: SampleOrganismProps) {
 
 
     const handleIdListSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(e.target.value === '') { setIdListSize(0); }
+        if(e.target.value === '') { set_rows_count(0); }
         else {
             const str_numb = e.target.value;
-            setIdListSize(parseInt(str_numb));
+            set_rows_count(parseInt(str_numb));
         }
     }
 
     const handleSampleNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(e.target.value === '') { setSampleNumber(0); }
+        if(e.target.value === '') { set_samples_count(0); }
         else {
             const str_numb = e.target.value;
-            setSampleNumber(parseInt(str_numb));
+            set_samples_count(parseInt(str_numb));
         }
     }
 
     return (
         <div className={'sample-organism-div'}>
-            <form onSubmit={useSelect}>
+            <form onSubmit={useQuery}>
                 <div className={'sample-organism-input-container'}>
-                    <label>Set id list size:</label>
-                    <input
-                        id="idListSizeInput"
-                        type="number"
-                        step="1"
-                        className={''}
-                        placeholder={'0'}
-                        required={true}
-                        onChange={handleIdListSize}
-                    />
-                </div>
-                <div className={'sample-organism-input-container'}>
-                    <label>Set sample number:</label>
+                    <label>Set samples count:</label>
                     <input
                         id="sampleNumberInput"
                         type="number"
@@ -74,9 +63,23 @@ export default function SampleOrganism({path}: SampleOrganismProps) {
                         onChange={handleSampleNumber}
                     />
                 </div>
-                <button type={'submit'} onClick={() => {}} className={'data-generator-button'}>Show Results</button>
+                <div className={'sample-organism-input-container'}>
+                    <label>Set rows count:</label>
+                    <input
+                        id="rowsCount"
+                        type="number"
+                        step="1"
+                        className={''}
+                        placeholder={'0'}
+                        required={true}
+                        onChange={handleIdListSize}
+                    />
+                </div>
+                <button type={'submit'} onClick={() => {
+                }} className={'data-generator-button'}>Show Results
+                </button>
             </form>
-            <ResultsOrganism postgreTimes={postgreTimes} mongoTimes={mongoTimes} />
+            <ResultsOrganism postgreTimes={postgreTimes} mongoTimes={mongoTimes}/>
         </div>
     )
 }

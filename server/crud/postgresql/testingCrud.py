@@ -9,9 +9,6 @@ from passlib.context import CryptContext
 
 import time
 
-from server.schemas.postgresql.deviceTypeSchemas import DeviceType
-
-
 # User queries to test
 
 def selectUsersTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
