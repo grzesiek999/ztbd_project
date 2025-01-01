@@ -39,7 +39,7 @@ def insert_users(db: Database, users: List[UserCreate]) -> float:
 def update_users(db: Database, users_update_data: List[UserUpdate]) -> float:
     updates = []
     for user in users_update_data:
-        user_data = user.dict(exclude_unset=True)
+        user_data = user.model_dump(exclude_unset=True)
         user_id = user_data.pop('id')
         if user_data:
             updates.append(

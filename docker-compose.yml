@@ -47,8 +47,7 @@ services:
     ports:
       - "${FASTAPI_PORT_HOST}:${FASTAPI_PORT_CONTAINER}"
     volumes:
-      - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
-      - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
+      - ./${DATA_DIR}:/${DATA_DIR}
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CONTAINER_NAME}:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
@@ -77,8 +76,7 @@ services:
       - "5678:5678"  # port debugowania
     volumes:
       - ./server:/app
-      - ./${MONGO_DATA_DIR}:/${MONGO_DATA_DIR}
-      - ./${POSTGRES_DATA_DIR}:/${POSTGRES_DATA_DIR}
+      - ./${DATA_DIR}:/${DATA_DIR}
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@${MONGO_CONTAINER_NAME}:${MONGO_PORT}/${MONGO_DB_NAME}?authSource=admin
