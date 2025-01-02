@@ -55,7 +55,7 @@ export default function CreatePageContent() {
                     className={addDevicesGestures ? activeClass : noActiveClass}
                 >CREATE devices gestures</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path} httpMethod={"POST"} />
         </div>
     )
 }

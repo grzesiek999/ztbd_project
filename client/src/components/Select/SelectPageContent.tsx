@@ -55,7 +55,7 @@ export default function SelectPageContent() {
                     className={deviceGestureByDeviceId ? activeClass : noActiveClass}
                 >SELECT devices gestures by device id</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path}  httpMethod={"POST"}/>
         </div>
     )
 }

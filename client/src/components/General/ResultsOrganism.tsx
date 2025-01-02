@@ -1,6 +1,6 @@
-import LineChart from "./LineChart.tsx";
 import TableOfData from "./TableOfData.tsx";
 import {useEffect, useState} from "react";
+import ScatterChart from "./ScatterChart.tsx";
 
 type ResultsOrganismProps = {
     postgreTimes: number[],
@@ -44,8 +44,8 @@ export default function ResultsOrganism({postgreTimes, mongoTimes}: ResultsOrgan
                 <TableOfData title={'Mongo times'} timesArray={mongoTimes}/>
             </div>
             <div className="charts-div">
-                <LineChart title={'Postgre times'} timesArray={postgreTimes} chartColor={'blue'}/>
-                <LineChart title={'Mongo times'} timesArray={mongoTimes} chartColor={'red'}/>
+                <ScatterChart title={'Postgre times'} timesArray={postgreTimes} chartColor={'blue'}/>
+                <ScatterChart title={'Mongo times'} timesArray={mongoTimes} chartColor={'red'}/>
             </div>
             <div className="tables-div">
                 <span>Average time: {postgreAverageTime.toFixed(3)}</span>
