@@ -1,7 +1,6 @@
-import { Line } from 'react-chartjs-2';
+import { Scatter } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
-    LineElement,
     CategoryScale,
     LinearScale,
     PointElement,
@@ -10,34 +9,31 @@ import {
     ChartOptions,
 } from 'chart.js';
 
-ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
-type LineChartProps = {
+type ScatterChartProps = {
     title: string;
     timesArray: number[];
     chartColor: string;
 };
 
-const LineChart = ({ title, timesArray, chartColor}: LineChartProps) => {
-    const labels = Array.from(
-        { length: timesArray.length },
-        (_, index) => `Sample ${index + 1}`
-    );
+const ScatterChart = ({ title, timesArray, chartColor }: ScatterChartProps) => {
+    const scatterData = timesArray.map((time, index) => ({
+        x: index + 1,
+        y: time,
+    }));
 
     const data = {
-        labels,
         datasets: [
             {
                 label: title,
-                data: timesArray,
-                borderColor: chartColor,
-                backgroundColor: 'rgba(0, 0, 255, 0.1)',
-                tension: 0.4,
+                data: scatterData,
+                backgroundColor: chartColor,
             },
         ],
     };
 
-    const options: ChartOptions<'line'> = {
+    const options: ChartOptions<'scatter'> = {
         responsive: true,
         plugins: {
             legend: {
@@ -49,11 +45,19 @@ const LineChart = ({ title, timesArray, chartColor}: LineChartProps) => {
         },
         scales: {
             x: {
+                title: {
+                    display: true,
+                    text: 'Sample Index',
+                },
                 grid: {
                     display: false,
                 },
             },
             y: {
+                title: {
+                    display: true,
+                    text: 'Time Value',
+                },
                 grid: {
                     display: true,
                 },
@@ -62,7 +66,7 @@ const LineChart = ({ title, timesArray, chartColor}: LineChartProps) => {
         },
     };
 
-    return <Line data={data} options={options} />;
+    return <Scatter data={data} options={options} />;
 };
 
-export default LineChart;
+export default ScatterChart;

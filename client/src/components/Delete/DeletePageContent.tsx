@@ -55,7 +55,7 @@ export default function DeletePageContent() {
                     className={deleteDeviceGestureByGestureType ? activeClass : noActiveClass}
                 >DELETE devices gestures by gesture type</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path} httpMethod={"DELETE"} />
         </div>
     )
 }

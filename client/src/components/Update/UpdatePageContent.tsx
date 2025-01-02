@@ -55,7 +55,7 @@ export default function UpdatePageContent() {
                     className={updateGesture ? activeClass : noActiveClass}
                 >UPDATE gesture</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path} httpMethod={"PUT"}/>
         </div>
     )
 }

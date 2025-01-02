@@ -18,7 +18,7 @@ const TableOfData = ({title, timesArray}: TableOfDataProps) => {
                 {labels.map((label, index) => (
                     <li key={index}>
                         <p className={'temp'}>{label}</p>
-                        <p>{timesArray[index]} ms</p>
+                        <p>{timesArray[index].toFixed(3)} ms</p>
                     </li>
                 ))}
             </ul>
