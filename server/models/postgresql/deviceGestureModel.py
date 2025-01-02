@@ -14,4 +14,3 @@ class DeviceGesture(Base):
 
     gesture = relationship("Gesture", back_populates="device_gestures")
     device = relationship("Device", back_populates="device_gestures")
-    gesture_logs = relationship("GestureLogs", back_populates="device_gesture", cascade="all, delete-orphan")
