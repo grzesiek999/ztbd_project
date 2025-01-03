@@ -65,24 +65,20 @@ def generate_device(owner_id):
     return device
 
 
-def generate_device_gesture():
+def generate_gesture():
     gesture = random.choice(gestures)
-    gesture = {
-        "gesture_type": gesture["gesture_type"],
-        "gesture_name": fake.word(),
-        "gesture_description": gesture["description"]
-    }
+    return gesture
+
+
+def generate_device_gesture():
+    gesture = generate_gesture()
+    gesture["gesture_name"] = fake.word()
     return gesture
 
 
 def generate_device_type():
     device_type = random.choice(device_types)
     return device_type
-
-
-def generate_gesture():
-    gesture = random.choice(gestures)
-    return gesture
 
 
 # Funkcja generująca dane użytkowników
