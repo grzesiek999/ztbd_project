@@ -12,9 +12,9 @@ export default function DeletePageContent() {
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
-    const deleteUsersByUserIdPath = '';
-    const deleteDeviceByDeviceIdPath = '';
-    const deleteDeviceGestureByGestureTypePath = '';
+    const deleteUsersByUserIdPath = 'http://localhost:8000/test/delete/user';
+    const deleteDeviceByDeviceIdPath = 'http://localhost:8000/test/delete/device';
+    const deleteDeviceGestureByGestureTypePath = 'http://localhost:8000/test/delete/gesture';
 
     useEffect(() => {
         if (deleteUsersByUserId) { setPath(deleteUsersByUserIdPath); }
@@ -55,7 +55,7 @@ export default function DeletePageContent() {
                     className={deleteDeviceGestureByGestureType ? activeClass : noActiveClass}
                 >DELETE devices gestures by gesture type</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path} httpMethod={"DELETE"} />
         </div>
     )
 }

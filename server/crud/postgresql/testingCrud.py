@@ -9,7 +9,6 @@ from passlib.context import CryptContext
 
 import time
 
-
 # User queries to test
 
 def selectUsersTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
@@ -30,7 +29,6 @@ def selectUsersTest(request: utils.IdListRequest, db: Session = Depends(database
 
     return query_time
 
-
 def insertUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depends(database.get_db)):
     if not user_list:
         raise HTTPException(status_code=400, detail="The user_list cannot be empty.")
@@ -40,8 +38,8 @@ def insertUsersTest(user_list: List[userSchemas.UserCreate], db: Session = Depen
     bulk_data = [
         {
             "username": user.username,
-            "email": user.email,
-            "password_hash": user.password_hash
+            "email": user.email.lower(),
+            "password_hash": CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
         }
         for user in user_list
     ]
@@ -71,8 +69,8 @@ def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depen
             raise HTTPException(status_code=400, detail=f"User with id {user.user_id} not found")
 
         db_user.username = user.username
-        db_user.email = user.email
-        db_user.password_hash = user.password_hash
+        db_user.email = user.email.lower()
+        db_user.password_hash = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
         users_to_update.append(db_user)
 
     start = time.time()
@@ -88,7 +86,6 @@ def updateUsersTest(user_list: List[userSchemas.UserUpdate], db: Session = Depen
     query_time = (end - start) * 1000
 
     return query_time
-
 
 def deleteUsersTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
     id_list = request.id_list
@@ -131,7 +128,6 @@ def selectDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
 
     return query_time
 
-
 def insertDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session = Depends(database.get_db)):
     if not device_list:
         raise HTTPException(status_code=400, detail="The device_list cannot be empty.")
@@ -161,7 +157,6 @@ def insertDevicesTest(device_list: List[deviceSchemas.DeviceCreate], db: Session
 
     return query_time
 
-
 def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session = Depends(database.get_db)):
     if not device_list:
         raise HTTPException(status_code=400, detail="The device_list cannot be empty.")
@@ -189,7 +184,6 @@ def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session
     query_time = (end - start) * 1000
 
     return query_time
-
 
 def deleteDevicesTest(request: utils.IdListRequest, db: Session = Depends(database.get_db)):
     id_list = request.id_list
@@ -287,8 +281,7 @@ def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session =
     if not gesture:
         raise HTTPException(status_code=400, detail="The gesture cannot be empty.")
 
-    db_gesture = db.query(gestureModel.Gesture).filter(
-        gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
+    db_gesture = db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture.gesture_type).first()
 
     start = time.time()
 
@@ -304,7 +297,6 @@ def updateGestureTest(gesture: gestureSchemas.GestureUpdateByType, db: Session =
 
     return query_time
 
-
 def deleteGestureTest(gesture_type: str, db: Session = Depends(database.get_db)):
     if not gesture_type:
         raise HTTPException(status_code=400, detail="The gesture_type cannot be empty.")
@@ -312,8 +304,7 @@ def deleteGestureTest(gesture_type: str, db: Session = Depends(database.get_db))
     start = time.time()
 
     try:
-        db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type == gesture_type).delete(
-            synchronize_session=False)
+        db.query(gestureModel.Gesture).filter(gestureModel.Gesture.gesture_type==gesture_type).delete(synchronize_session=False)
         db.commit()
     except Exception as e:
         db.rollback()

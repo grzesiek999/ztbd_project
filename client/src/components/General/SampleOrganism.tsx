@@ -1,69 +1,77 @@
-import {SyntheticEvent, useState} from "react";
+import {SyntheticEvent, useEffect, useState} from "react";
 import ResultsOrganism from "./ResultsOrganism.tsx";
 
 
 type SampleOrganismProps = {
     path: string
+    httpMethod: string;
 }
 
-export default function SampleOrganism({path}: SampleOrganismProps) {
+export default function SampleOrganism({path, httpMethod}: SampleOrganismProps) {
 
-    const [sampleNumber, setSampleNumber] = useState<number>(0);
-    const [idListSize, setIdListSize] = useState<number>(0);
+    const [samples_count, set_samples_count] = useState<number>(0);
+    const [rows_count, set_rows_count] = useState<number>(0);
     const [postgreTimes, setPostgreTimes] = useState<number[]>([]);
     const [mongoTimes, setMongoTimes] = useState<number[]>([]);
+    const [sendData, setSendData] = useState<{}>({});
 
-    const useSelect = async (e: SyntheticEvent) => {
+    const useQuery = async (e: SyntheticEvent) => {
         e.preventDefault();
 
         const response = await fetch(path, {
-            method: 'POST',
+            method: httpMethod,
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                sampleNumber,
-                idListSize
-            })
+            body: JSON.stringify(sendData)
         });
         if (response.ok) {
             const data = await response.json();
+
+            if (data.mongo_execution_times && Array.isArray(data.mongo_execution_times)) {
+                setMongoTimes(data.mongo_execution_times);
+            } else { setMongoTimes([]); }
+
+            if (data.postgres_execution_times && Array.isArray(data.postgres_execution_times)) {
+                setPostgreTimes(data.postgres_execution_times);
+            } else { setPostgreTimes([]); }
 
         } else { console.log(response.status, response.statusText); }
     }
 
 
+    useEffect(()=>{
+        const data: Record<string, number | null> = {};
+
+        if (samples_count !== null) {
+            data.samples_count = samples_count;
+        }
+        if (rows_count !== null && rows_count !== 0) {
+            data.rows_count = rows_count;
+        }
+
+        setSendData(data);
+    },[samples_count, rows_count])
+
     const handleIdListSize = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(e.target.value === '') { setIdListSize(0); }
+        if(e.target.value === '') { set_rows_count(0); }
         else {
             const str_numb = e.target.value;
-            setIdListSize(parseInt(str_numb));
+            set_rows_count(parseInt(str_numb));
         }
     }
 
     const handleSampleNumber = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(e.target.value === '') { setSampleNumber(0); }
+        if(e.target.value === '') { set_samples_count(0); }
         else {
             const str_numb = e.target.value;
-            setSampleNumber(parseInt(str_numb));
+            set_samples_count(parseInt(str_numb));
         }
     }
 
     return (
         <div className={'sample-organism-div'}>
-            <form onSubmit={useSelect}>
+            <form onSubmit={useQuery}>
                 <div className={'sample-organism-input-container'}>
-                    <label>Set id list size:</label>
-                    <input
-                        id="idListSizeInput"
-                        type="number"
-                        step="1"
-                        className={''}
-                        placeholder={'0'}
-                        required={true}
-                        onChange={handleIdListSize}
-                    />
-                </div>
-                <div className={'sample-organism-input-container'}>
-                    <label>Set sample number:</label>
+                    <label>Set samples count:</label>
                     <input
                         id="sampleNumberInput"
                         type="number"
@@ -74,9 +82,23 @@ export default function SampleOrganism({path}: SampleOrganismProps) {
                         onChange={handleSampleNumber}
                     />
                 </div>
-                <button type={'submit'} onClick={() => {}} className={'data-generator-button'}>Show Results</button>
+                <div className={'sample-organism-input-container'}>
+                    <label>Set rows count:</label>
+                    <input
+                        id="rowsCount"
+                        type="number"
+                        step="1"
+                        className={''}
+                        placeholder={'0'}
+                        required={false}
+                        onChange={handleIdListSize}
+                    />
+                </div>
+                <button type={'submit'} onClick={() => {
+                }} className={'data-generator-button'}>Show Results
+                </button>
             </form>
-            <ResultsOrganism postgreTimes={postgreTimes} mongoTimes={mongoTimes} />
+            <ResultsOrganism postgreTimes={postgreTimes} mongoTimes={mongoTimes}/>
         </div>
     )
 }

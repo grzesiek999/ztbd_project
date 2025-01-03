@@ -12,9 +12,9 @@ export default function UpdatePageContent() {
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
-    const updateUsersPath = '';
-    const updateDevicesPath = '';
-    const updateGesturePath = '';
+    const updateUsersPath = 'http://localhost:8000/test/update/user';
+    const updateDevicesPath = 'http://localhost:8000/test/update/device';
+    const updateGesturePath = 'http://localhost:8000/test/update/gesture';
 
     useEffect(() => {
         if (updateUsers) { setPath(updateUsersPath); }
@@ -55,7 +55,7 @@ export default function UpdatePageContent() {
                     className={updateGesture ? activeClass : noActiveClass}
                 >UPDATE gesture</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path} httpMethod={"PUT"}/>
         </div>
     )
 }

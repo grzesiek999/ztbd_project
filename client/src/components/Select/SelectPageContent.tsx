@@ -12,9 +12,9 @@ export default function SelectPageContent() {
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
-    const usersByUserIdPath = '';
-    const deviceByUserIdPath = '';
-    const deviceGestureByDeviceIdPath = '';
+    const usersByUserIdPath = 'http://localhost:8000/test/select/user';
+    const deviceByUserIdPath = 'http://localhost:8000/test/select/device';
+    const deviceGestureByDeviceIdPath = 'http://localhost:8000/test/select/device_gestures';
 
     useEffect(() => {
         if (usersByUserId) { setPath(usersByUserIdPath); }
@@ -55,7 +55,7 @@ export default function SelectPageContent() {
                     className={deviceGestureByDeviceId ? activeClass : noActiveClass}
                 >SELECT devices gestures by device id</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path}  httpMethod={"POST"}/>
         </div>
     )
 }

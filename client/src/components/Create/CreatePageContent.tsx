@@ -12,9 +12,9 @@ export default function CreatePageContent() {
 
     const activeClass = 'active-button'
     const noActiveClass = 'no-active-button'
-    const addUsersPath = '';
-    const addDevicesPath = '';
-    const addDevicesGesturesPath = '';
+    const addUsersPath = 'http://localhost:8000/test/insert/user';
+    const addDevicesPath = 'http://localhost:8000/test/insert/device';
+    const addDevicesGesturesPath = 'http://localhost:8000/test/insert/gesture';
 
     useEffect(() => {
         if (addUsers) { setPath(addUsersPath); }
@@ -55,7 +55,7 @@ export default function CreatePageContent() {
                     className={addDevicesGestures ? activeClass : noActiveClass}
                 >CREATE devices gestures</button>
             </div>
-            <SampleOrganism path={path} />
+            <SampleOrganism path={path} httpMethod={"POST"} />
         </div>
     )
 }
