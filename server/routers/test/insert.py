@@ -6,7 +6,7 @@ from core.mongo.database import get_db as get_mongo_db
 from core.postgresql import database as get_postgresql_db
 
 from schemas.test import SamplesCount, SamplesAndRowsCount, ExecutionTime
-from schemas.postgresql import userSchemas, deviceSchemas, gestureSchemas, utils
+from schemas.postgresql import userSchemas, deviceSchemas, deviceGestureSchemas
 from schemas.mongo.user import UserCreate as MongoUserCreate
 from schemas.mongo.device import DeviceCreate as MongoDeviceCreate
 from schemas.mongo.device_gesture import DeviceGestureCreate, BulkDeviceGesturesCreate
@@ -18,7 +18,7 @@ from routers.db_data import drop_and_import_data
 from crud.mongo.user import insert_users as mongo_insert_users
 from crud.mongo.device import insert_devices as mongo_insert_devices
 from crud.mongo.device_gesture import insert_gestures_by_device_type as mongo_insert_device_gestures
-from crud.postgresql.testingCrud import insertUsersTest, insertDevicesTest
+from crud.postgresql.testingCrud import insertUsersTest, insertDevicesTest, insertDeviceGesturesTest
 
 router = APIRouter()
 
@@ -93,15 +93,19 @@ def insert_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
 
 @router.post("/gesture", response_model=ExecutionTime)
 def insert_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
-                   postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+                    postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
 
     device_type = generate_device_type()
     gesture = generate_device_gesture()
+    gesture["gesture_description"] = gesture.pop("description", None)
+    gesture_id = gesture.pop('id', None)
 
     mongo_gesture_and_devicetype = BulkDeviceGesturesCreate(device_type=device_type,
                                                             gesture=DeviceGestureCreate(**gesture))
-    # postgres_device_gesture = gestureSchemas.DeviceGestureCreate(**gesture)
+    postgres_gesture_and_devicetype = deviceGestureSchemas.DeviceGestureCreateTest(device_type_name=device_type,
+                                                                                   gesture_name=gesture["gesture_name"],
+                                                                                   gesture_id=gesture_id)
 
     postgres_times = []
     mongo_times = []
@@ -109,8 +113,8 @@ def insert_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mong
     for i in range(samples_count):
         mongo_time = mongo_insert_device_gestures(mongo_db, mongo_gesture_and_devicetype)
         mongo_times.append(mongo_time)
-        # postgres_time = createDeviceGesturesTest(postgres_devices, postgresql_db)
-        # postgres_times.append(postgres_time)
+        postgres_time = insertDeviceGesturesTest(postgres_gesture_and_devicetype, postgresql_db)
+        postgres_times.append(postgres_time)
 
         drop_and_import_data(postgresql_db)
 

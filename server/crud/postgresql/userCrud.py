@@ -26,8 +26,8 @@ def get_users_by_created_at(db: Session, created_at: datetime):
 def create_user(db: Session, user: userSchemas.UserCreate):
     db_user = userModel.User(
         username=user.username,
-        email=user.email.lower(),
-        password_hash=CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
+        email=user.email,
+        password_hash=user.password_hash
     )
     db.add(db_user)
     db.commit()
@@ -41,9 +41,9 @@ def update_user(db: Session, user: userSchemas.UserUpdate):
         if user.username is not None:
             db_user.username = user.username
         if user.email is not None:
-            db_user.email = user.email.lower()
+            db_user.email = user.email
         if user.password_hash is not None:
-            db_user.password_hash = CryptContext(schemes=["bcrypt"], deprecated="auto").hash(user.password_hash)
+            db_user.password_hash = user.password_hash
 
         db.commit()
         db.refresh(db_user)

@@ -6,12 +6,11 @@ from core.mongo.database import get_db as get_mongo_db
 from core.postgresql import database as get_postgresql_db
 
 from schemas.test import SamplesCount, SamplesAndRowsCount, ExecutionTime
-from schemas.postgresql import userSchemas, deviceSchemas, gestureSchemas, utils
+from schemas.postgresql import utils
 from schemas.mongo.device_gesture import DeviceGestureDeletePattern
 
 from routers.test import utils as test_utils
-from data_generator import generate_user, generate_device, generate_device_gesture, generate_device_type, \
-    generate_gesture
+from data_generator import generate_gesture
 from routers.db_data import drop_and_import_data
 
 from crud.mongo.user import delete_users as mongo_delete_users
