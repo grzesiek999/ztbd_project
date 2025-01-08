@@ -7,7 +7,7 @@ export default function DataGenerator() {
     const [deviceCount, setDeviceCount] = useState<number>(0)
     const [gestureCount, setGestureCount] = useState<number>(0)
     const [log_count, setLogCount] = useState<number>(0)
-
+    const [message, setMessage] = useState<string | null>(null)
 
     const [device_count_range, setDeviceCountRange] = useState([0, 0]);
     const [gesture_count_range, setGestureCountRange] = useState([0, 0]);
@@ -26,9 +26,8 @@ export default function DataGenerator() {
                 log_count
             })
         });
-        if (response.ok) {
-
-        } else {console.log(response.status, response.statusText)}
+        if (response.ok) { setMessage('Data imported successfully !'); }
+        else { console.log(response.status, response.statusText); }
     }
 
     const handleUserCount = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -52,14 +51,6 @@ export default function DataGenerator() {
         else {
             const str_numb = e.target.value;
             setGestureCount(parseInt(str_numb));
-        }
-    }
-
-    const handleLogCount = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if(e.target.value === '') { setLogCount(0); }
-        else {
-            const str_numb = e.target.value;
-            setLogCount(parseInt(str_numb));
         }
     }
 
@@ -103,18 +94,9 @@ export default function DataGenerator() {
                     required={true}
                     onChange={handleGestureCountRange}
                 />
-                <label>Log count:</label>
-                <input
-                    id="logCountInput"
-                    type="number"
-                    step="1"
-                    className={''}
-                    placeholder={'0'}
-                    required={true}
-                    onChange={handleLogCount}
-                />
                 <button type={'submit'} onClick={()=>{} } className={'data-generator-button'}>Wygeneruj i zaimportuj dane</button>
             </form>
+            {message && <span className={'data-import-span-message'}>{message}</span>}
         </div>
     )
 }

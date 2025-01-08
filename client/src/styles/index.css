@@ -172,6 +172,17 @@ h1 {
   cursor: pointer;
 }
 
+.data-import-span-message {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 20px;
+  letter-spacing: 1px;
+  font-family: "Special Elite", system-ui;
+  font-weight: 400;
+  font-style: normal;
+  color: darkgreen;
+}
+
 .select-page-div {
   box-sizing: border-box;
   min-width: 100%;

@@ -102,8 +102,6 @@ def run_postgre_import(db: Session):
     import_gestures(db)
     import_devices(db)
     import_device_gestures(db)
-    # import_gesture_logs(db)
-
 
 def clear_postgre(db: Session):
     clear_database(db)
