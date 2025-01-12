@@ -35,9 +35,9 @@
 1. Run docker-compose up<br>
    a) Development:
    ```
-   docker-compose up -d mongo postgres fastapi_dev
+   docker-compose up -d mongo postgres fastapi_dev react-app
    ```
    b) Production:
    ```
-   docker-compose up -d mongo postgres fastapi
+   docker-compose up -d mongo postgres fastapi react-app
    ```

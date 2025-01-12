@@ -110,7 +110,6 @@ services:
       - NODE_ENV=development
     depends_on:
       - fastapi
-      - fastapi_dev
 
 volumes:
   mongo_data:

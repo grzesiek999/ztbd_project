@@ -173,8 +173,9 @@ def updateDevicesTest(device_list: List[deviceSchemas.DeviceUpdate], db: Session
         if not db_device:
             raise HTTPException(status_code=400, detail=f"Device with id {device.device_id} not found")
 
-        db_device.device_name = device.device_name.lower()
+        db_device.device_name = device.device_name
         db_device.device_type_id = device.device_type_id
+        db_device.user_id = device.user_id
         devices_to_update.append(db_device)
 
     start = time.time()

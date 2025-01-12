@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from data_generator import generate_data_and_export
 import subprocess
 import os
+import time
+import logging
 from pymongo.database import Database
 
 from schemas.db_data import ImportRequest
@@ -19,6 +21,9 @@ from core.postgresql.utils import (
 from core.postgresql import database
 import paramiko
 from urllib.parse import urlparse
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -38,9 +43,23 @@ def import_data(request: ImportRequest, db_postgre: Session = Depends(database.g
 
 def drop_and_import_data(db_postgre: Session = Depends(database.get_db)):
     """ Drop all data from the databases and import the generated data """
+    start_time_mongo_import = time.time()
     mongo_import()
+    end_time_mongo_import = time.time()
+    mongo_import_time = end_time_mongo_import - start_time_mongo_import
+    logger.info(f"Czas wykonania mongo import: {mongo_import_time:.2f} sekund")
+
+    start_time_postgre_delete = time.time()
     delete_data(db_postgre)
+    end_time_postgre_delete = time.time()
+    postgre_delete_time = end_time_postgre_delete - start_time_postgre_delete
+    logger.info(f"Czas wykonania postgre delete: {postgre_delete_time:.2f} sekund")
+
+    start_time_postgre_import = time.time()
     run_postgre_import(db_postgre)
+    end_time_postgre_import = time.time()
+    postgre_import_time = end_time_postgre_import - start_time_postgre_import
+    logger.info(f"Czas wykonania postgre import: {postgre_import_time:.2f} sekund")
 
     return {"message": "Data imported successfully"}
 
@@ -102,6 +121,7 @@ def run_postgre_import(db: Session):
     import_gestures(db)
     import_devices(db)
     import_device_gestures(db)
+
 
 def clear_postgre(db: Session):
     clear_database(db)

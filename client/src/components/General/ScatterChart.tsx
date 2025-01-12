@@ -56,7 +56,7 @@ const ScatterChart = ({ title, timesArray, chartColor }: ScatterChartProps) => {
             y: {
                 title: {
                     display: true,
-                    text: 'Time Value',
+                    text: 'Time Value (ms)',
                 },
                 grid: {
                     display: true,

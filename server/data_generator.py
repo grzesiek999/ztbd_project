@@ -9,8 +9,13 @@ from dotenv import load_dotenv
 
 from faker import Faker
 from bson import ObjectId
+import logging
+import time
 
 load_dotenv()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 fake = Faker()
 
@@ -113,7 +118,11 @@ def generate_users_with_devices(user_count, device_types, gestures_list,
 def generate_devices_with_gestures(user_id, device_types, gestures_list,
                                    device_count_range, gesture_count_range):
     devices = []
-    for _ in range(random.randint(*device_count_range)):  # Liczba urządzeń dla użytkownika
+    if device_count_range[0] == device_count_range[1]:
+        device_count = device_count_range[0]
+    else:
+        device_count = random.randint(*device_count_range)
+    for _ in range(device_count):  # Liczba urządzeń dla użytkownika
         device = generate_device(user_id)
         # device_type = random.choice(device_types)
         device = {
@@ -135,7 +144,11 @@ def generate_devices_with_gestures(user_id, device_types, gestures_list,
 # Funkcja generująca gesty przypisane do urządzenia
 def generate_device_gestures(gestures, gesture_count_range=GESTURE_COUNT_RANGE):
     device_gestures = []
-    available_gestures = random.sample(gestures, random.randint(*gesture_count_range))  # Losowanie gestów bez powtórzeń
+    # logger.info(f"gesture_count_range: {gesture_count_range}")
+    if gesture_count_range[0] == gesture_count_range[1]:
+        available_gestures = random.sample(gestures, gesture_count_range[0])
+    else:
+        available_gestures = random.sample(gestures, random.randint(*gesture_count_range))  # Losowanie gestów bez powtórzeń
     for gesture in available_gestures:
         device_gestures.append({
             "gesture_id": str(ObjectId()),
@@ -295,10 +308,17 @@ def export_data(data):
 def generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
                              device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE,
                              log_count=LOG_COUNT):
+    start_time = time.time()
     data = generate_data(user_count=user_count, device_types=device_types, gestures_list=gestures_list,
                          device_count_range=device_count_range, gesture_count_range=gesture_count_range,
                          log_count=log_count)
     export_data(data)
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    logger.info(f"Czas generowania danych: {execution_time:.2f} sekund")
+    logger.info(f"Parametry: USER_COUNT={user_count}, DEVICE_COUNT_RANGE={device_count_range}, "
+                f"GESTURE_COUNT_RANGE={gesture_count_range}, LOG_COUNT={log_count}")
 
 # generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
 #                                  device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)

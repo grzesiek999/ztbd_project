@@ -55,8 +55,8 @@ export default function DataGenerator() {
     }
 
     useEffect(() => {
-        setDeviceCountRange([0, deviceCount]);
-        setGestureCountRange([0, gestureCount]);
+        setDeviceCountRange([deviceCount, deviceCount]);
+        setGestureCountRange([gestureCount, gestureCount]);
     }, [deviceCount, gestureCount]);
 
 

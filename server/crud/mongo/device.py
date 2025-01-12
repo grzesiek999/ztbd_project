@@ -37,7 +37,7 @@ def insert_devices(db: Database, devices: List[DeviceCreate]) -> float:
 def update_devices(db: Database, devices_update_data: List[DeviceUpdate]) -> float:
     updates = []
     for device in devices_update_data:
-        device_data = device.dict(exclude_unset=True)
+        device_data = device.model_dump(exclude_unset=True)
         device_id = device_data.pop('id')
         device_data['owner_id'] = ObjectId(device_data['owner_id'])
         if device_data:
