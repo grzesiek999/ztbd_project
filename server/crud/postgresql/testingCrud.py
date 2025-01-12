@@ -1,11 +1,12 @@
 from fastapi import Depends, HTTPException
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 from typing import List
 from models.postgresql import userModel, deviceModel, deviceGestureModel, gestureModel, deviceTypeModel
 from schemas.postgresql import userSchemas, utils, deviceSchemas, deviceGestureSchemas, gestureSchemas
 from crud.postgresql import utilsCrud
 from core.postgresql import database
-from passlib.context import CryptContext
+from sqlalchemy.orm import joinedload
 
 import time
 
@@ -123,7 +124,7 @@ def selectDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
     start = time.time()
 
     try:
-        db.query(deviceModel.Device).filter(deviceModel.Device.user_id.in_(id_list)).all()
+        db.query(deviceModel.Device).options(joinedload(deviceModel.Device.device_gestures)).filter(deviceModel.Device.user_id.in_(id_list)).all()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to find device: {str(e)}")
 
@@ -251,36 +252,34 @@ def insertDeviceGesturesTest(request: deviceGestureSchemas.DeviceGestureCreateTe
     if not request:
         raise HTTPException(status_code=400, detail="The request cannot be empty.")
 
-    utilsCrud.reset_sequence(db,
-                             "SELECT setval('device_gestures_device_gesture_id_seq', (SELECT MAX(device_gesture_id) FROM device_gestures) + 1);")
-
-    db_device_type = db.query(deviceTypeModel.DeviceType).filter(
-        deviceTypeModel.DeviceType.type_name == request.device_type_name).first()
-
-    if not db_device_type:
-        raise HTTPException(status_code=404, detail="Device type not found.")
-
-    db_devices = db.query(deviceModel.Device).filter(
-        deviceModel.Device.device_type_id == db_device_type.device_type_id).all()
-
-    if not db_devices:
-        raise HTTPException(status_code=404, detail="No devices found for the given device type.")
-
-    bulk_data = [
-        {
-            "gesture_name": request.gesture_name,
-            "gesture_id": request.gesture_id,
-            "device_id": device.device_id
-        }
-        for device in db_devices
-    ]
+    utilsCrud.reset_sequence(db, "SELECT setval('device_gestures_device_gesture_id_seq', (SELECT MAX(device_gesture_id) FROM device_gestures) + 1);")
 
     start = time.time()
 
     try:
+        subquery = (
+            db.query(deviceModel.Device.device_id)
+            .join(deviceTypeModel.DeviceType, deviceModel.Device.device_type_id == deviceTypeModel.DeviceType.device_type_id)
+            .filter(deviceTypeModel.DeviceType.type_name == request.device_type_name)
+            .subquery()
+        )
+
+        devices_exist = db.query(subquery).count()
+        if devices_exist == 0:
+            raise HTTPException(status_code=404, detail="No devices found for the given device type.")
+
+        bulk_data = [
+            {
+                "gesture_name": request.gesture_name,
+                "gesture_id": request.gesture_id,
+                "device_id": row.device_id
+            }
+            for row in db.query(subquery).all()
+        ]
+
         db.bulk_insert_mappings(deviceGestureModel.DeviceGesture, bulk_data)
         db.commit()
-    except Exception as e:
+    except SQLAlchemyError as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Failed to create device gestures: {str(e)}")
 
