@@ -1,0 +1,41 @@
+.home-page-div-wrapper {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    letter-spacing: 1px;
+    font-family: "Special Elite", system-ui;
+    font-style: normal;
+    color: #17222c;
+    padding: 40px 100px;
+}
+
+.home-page-div-wrapper span{
+    font-size: 48px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.home-page-div-wrapper p{
+    font-size: 24px;
+    font-weight: 400;
+    text-align: center;
+    margin: 20px 0;
+    padding: 0;
+    line-height: 40px;
+}
+
+.home-page-images-div {
+    margin: 10px 0 0 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.home-page-images-div img{
+    width: 100px;
+}

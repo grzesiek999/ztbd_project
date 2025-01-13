@@ -8,7 +8,12 @@ export default function WebsiteLayout() {
             <header>
                 <LayoutNav />
             </header>
-            <Outlet/>
+            <main>
+                <Outlet/>
+            </main>
+            <footer>
+            <span className="authors-span">Autorzy: Sylwia Zemła, Grzegorz Pasich</span>
+            </footer>
         </div>
     )
 }
