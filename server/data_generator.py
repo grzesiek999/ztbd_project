@@ -11,6 +11,9 @@ from faker import Faker
 from bson import ObjectId
 import logging
 import time
+from tqdm import tqdm
+# import cProfile
+from collections import defaultdict
 
 load_dotenv()
 
@@ -92,7 +95,8 @@ def generate_users_with_devices(user_count, device_types, gestures_list,
     devices = []
     users = []
 
-    for _ in range(user_count):
+    for _ in tqdm(range(user_count), desc="Generate users with devices", unit=" user_count"):
+        # for _ in range(user_count):
         user = generate_user()
         user_id = str(ObjectId())
         user_devices = generate_devices_with_gestures(user_id, device_types=device_types, gestures_list=gestures_list,
@@ -148,7 +152,8 @@ def generate_device_gestures(gestures, gesture_count_range=GESTURE_COUNT_RANGE):
     if gesture_count_range[0] == gesture_count_range[1]:
         available_gestures = random.sample(gestures, gesture_count_range[0])
     else:
-        available_gestures = random.sample(gestures, random.randint(*gesture_count_range))  # Losowanie gestów bez powtórzeń
+        available_gestures = random.sample(gestures,
+                                           random.randint(*gesture_count_range))  # Losowanie gestów bez powtórzeń
     for gesture in available_gestures:
         device_gestures.append({
             "gesture_id": str(ObjectId()),
@@ -159,7 +164,7 @@ def generate_device_gestures(gestures, gesture_count_range=GESTURE_COUNT_RANGE):
     return device_gestures
 
 
-# Funkcja generująca dane do PostgreSQL (CSV)
+# Funkcja mapujaca dane z JSON do PostgreSQL (CSV)
 def generate_postgres_csv_data(users_data, devices_data, logs_count):
     """ With logs for MongoDB and PostgreSQL"""
     users_csv_data = []
@@ -181,7 +186,12 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
     users_id_map = {'postgres_id': [], 'mongo_id': []}
     devices_id_map = {'postgres_id': [], 'mongo_id': []}
 
-    for user in users_data:
+    devices_by_owner = defaultdict(list)
+    for device in devices_data:
+        devices_by_owner[device["owner_id"]["$oid"]].append(device)
+
+    for user in tqdm(users_data, desc="Map data to postgres (csv) format", unit=" user_count"):
+        # for user in users_data:
         user_id += 1
         users_id_map['postgres_id'].append(user_id)
         users_id_map['mongo_id'].append(user["_id"]["$oid"])
@@ -189,7 +199,8 @@ def generate_postgres_csv_data(users_data, devices_data, logs_count):
         users_csv_data.append(
             [user_id, user["username"], user["email"], user["password_hash"], user["created_at"]["$date"]])
 
-        devices = [device for device in devices_data if device["owner_id"] == user["_id"]]
+        # devices = [device for device in devices_data if device["owner_id"] == user["_id"]]
+        devices = devices_by_owner.get(user["_id"]["$oid"], [])
 
         for device in devices:
             device_id += 1
@@ -320,5 +331,7 @@ def generate_data_and_export(user_count=USER_COUNT, device_types=device_types, g
     logger.info(f"Parametry: USER_COUNT={user_count}, DEVICE_COUNT_RANGE={device_count_range}, "
                 f"GESTURE_COUNT_RANGE={gesture_count_range}, LOG_COUNT={log_count}")
 
-# generate_data_and_export(user_count=USER_COUNT, device_types=device_types, gestures_list=gestures,
-#                                  device_count_range=DEVICE_COUNT_RANGE, gesture_count_range=GESTURE_COUNT_RANGE)
+
+# generate_data_and_export(user_count=300000, device_types=device_types, gestures_list=gestures,
+#                          device_count_range=(8, 8), gesture_count_range=(4, 4),
+#                          log_count=0)

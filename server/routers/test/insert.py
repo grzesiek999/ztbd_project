@@ -41,6 +41,9 @@ def insert_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
     postgres_times = []
     mongo_times = []
 
+    # Wake up the database
+    v = mongo_db.users.find({}).limit(1)
+    v2 = postgresql_db.query(userSchemas.User).limit(1)
     for i in range(samples_count):
         mongo_time = mongo_insert_users(mongo_db, mongo_users)
         mongo_times.append(mongo_time)
@@ -80,6 +83,9 @@ def insert_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
     postgres_times = []
     mongo_times = []
 
+    # Wake up the database
+    v = mongo_db.users.find({}).limit(1)
+    v2 = postgresql_db.query(userSchemas.User).limit(1)
     for i in range(samples_count):
         mongo_time = mongo_insert_devices(mongo_db, mongo_devices)
         mongo_times.append(mongo_time)
@@ -110,6 +116,9 @@ def insert_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mong
     postgres_times = []
     mongo_times = []
 
+    # Wake up the database
+    v = mongo_db.users.find({}).limit(1)
+    v2 = postgresql_db.query(userSchemas.User).limit(1)
     for i in range(samples_count):
         mongo_time = mongo_insert_device_gestures(mongo_db, mongo_gesture_and_devicetype)
         mongo_times.append(mongo_time)

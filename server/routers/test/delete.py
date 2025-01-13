@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from pymongo.database import Database
 from sqlalchemy.orm import Session
 
+import userSchemas
 from core.mongo.database import get_db as get_mongo_db
 from core.postgresql import database as get_postgresql_db
 
@@ -34,6 +35,9 @@ def delete_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
     postgres_times = []
     mongo_times = []
 
+    # Wake up the database
+    v = mongo_db.users.find({}).limit(1)
+    v2 = postgresql_db.query(userSchemas.User).limit(1)
     for i in range(samples_count):
         mongo_time = mongo_delete_users(mongo_db, mongo_users_id)
         mongo_times.append(mongo_time)
@@ -58,6 +62,9 @@ def delete_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
     postgres_times = []
     mongo_times = []
 
+    # Wake up the database
+    v = mongo_db.users.find({}).limit(1)
+    v2 = postgresql_db.query(userSchemas.User).limit(1)
     for i in range(samples_count):
         mongo_time = mongo_delete_devices(mongo_db, mongo_devices_id)
         mongo_times.append(mongo_time)
@@ -83,6 +90,9 @@ def delete_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mong
     postgres_times = []
     mongo_times = []
 
+    # Wake up the database
+    v = mongo_db.users.find({}).limit(1)
+    v2 = postgresql_db.query(userSchemas.User).limit(1)
     for i in range(samples_count):
         mongo_time = mongo_delete_gestures(mongo_db, mongo_gesture)
         mongo_times.append(mongo_time)
