@@ -90,6 +90,11 @@ def delete_devices_func(request: SamplesAndRowsCount, mongo_db: Database = Depen
 @router.delete("/gesture", response_model=ExecutionTime)
 def delete_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
                     postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return delete_gestures_func(request, mongo_db, postgresql_db)
+
+
+def delete_gestures_func(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
+                         postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
 
     gesture = generate_gesture()

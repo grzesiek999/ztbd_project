@@ -124,6 +124,11 @@ def update_devices_func(request: SamplesAndRowsCount, mongo_db: Database = Depen
 @router.put("/gesture", response_model=ExecutionTime)
 def update_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
                     postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return update_gestures_func(request, mongo_db, postgresql_db)
+
+
+def update_gestures_func(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
+                         postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
 
     gesture = generate_gesture()

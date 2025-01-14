@@ -111,6 +111,11 @@ def insert_devices_func(request: SamplesAndRowsCount, mongo_db: Database = Depen
 @router.post("/gesture", response_model=ExecutionTime)
 def insert_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
                     postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return insert_gestures_func(request, mongo_db, postgresql_db)
+
+
+def insert_gestures_func(request: SamplesCount, mongo_db: Database = Depends(get_mongo_db),
+                         postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
 
     device_type = generate_device_type()
