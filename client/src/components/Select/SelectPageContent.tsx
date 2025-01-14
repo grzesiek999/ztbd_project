@@ -35,7 +35,7 @@ export default function SelectPageContent() {
                         setDeviceGestureByUserId(false)
                     }}
                     className={usersByUserId ? activeClass : noActiveClass}
-                >SELECT users by user id</button>
+                >SELECT users</button>
                 <button
                     type={"button"}
                     onClick={() => {
@@ -44,7 +44,7 @@ export default function SelectPageContent() {
                         setDeviceGestureByUserId(false)
                     }}
                     className={deviceByUserId ? activeClass : noActiveClass}
-                >SELECT users devices data by user id</button>
+                >SELECT devices</button>
                 <button
                     type={"button"}
                     onClick={() => {
@@ -53,7 +53,7 @@ export default function SelectPageContent() {
                         setDeviceGestureByUserId(true)
                     }}
                     className={deviceGestureByDeviceId ? activeClass : noActiveClass}
-                >SELECT devices gestures by device id</button>
+                >SELECT device gestures</button>
             </div>
             <SampleOrganism path={path}  httpMethod={"POST"}/>
         </div>

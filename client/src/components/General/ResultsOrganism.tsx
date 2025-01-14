@@ -38,18 +38,18 @@ export default function ResultsOrganism({postgreTimes, mongoTimes}: ResultsOrgan
 
     return (
         <div className="results-organism-div">
-            <span>Results</span>
+            <span>Wyniki</span>
             <div className="tables-div">
-                <TableOfData title={'Postgre times'} timesArray={postgreTimes}/>
-                <TableOfData title={'Mongo times'} timesArray={mongoTimes}/>
+                <TableOfData title={'Tabela czasow dla PostgreSQL'} timesArray={postgreTimes}/>
+                <TableOfData title={'Tabela czasow dla MongoDB'} timesArray={mongoTimes}/>
             </div>
             <div className="charts-div">
-                <ScatterChart title={'Postgre times'} timesArray={postgreTimes} chartColor={'blue'}/>
-                <ScatterChart title={'Mongo times'} timesArray={mongoTimes} chartColor={'red'}/>
+                <ScatterChart title={'Wykres czasow dla PostgreSQL'} timesArray={postgreTimes} chartColor={'blue'}/>
+                <ScatterChart title={'Wykres czasow dla MongoDB'} timesArray={mongoTimes} chartColor={'red'}/>
             </div>
             <div className="tables-div">
-                <span>Average time (ms): {postgreAverageTime.toFixed(3)}</span>
-                <span>Average time (ms): {mongoAverageTime.toFixed(3)}</span>
+                <span>Sredni czas (ms): {postgreAverageTime.toFixed(3)}</span>
+                <span>Sredni czas (ms): {mongoAverageTime.toFixed(3)}</span>
             </div>
         </div>
     )

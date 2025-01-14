@@ -26,7 +26,7 @@ export default function DataGenerator() {
                 log_count
             })
         });
-        if (response.ok) { setMessage('Data imported successfully !'); }
+        if (response.ok) { setMessage('Dane zaimportowane pomyślnie !'); }
         else { console.log(response.status, response.statusText); }
     }
 
@@ -64,7 +64,7 @@ export default function DataGenerator() {
         <div className={'data-generator-div'}>
             <form onSubmit={importData}>
                 <span>Wprowadz dane</span>
-                <label>User count:</label>
+                <label>Liczba uzytkownikow:</label>
                 <input
                     id="userCountInput"
                     type="number"
@@ -74,7 +74,7 @@ export default function DataGenerator() {
                     required={true}
                     onChange={handleUserCount}
                 />
-                <label>Device count:</label>
+                <label>Liczba urzadzen:</label>
                 <input
                     id="deviceCountInput"
                     type="number"
@@ -84,7 +84,7 @@ export default function DataGenerator() {
                     required={true}
                     onChange={handleDeviceCountRange}
                 />
-                <label>Gesture count:</label>
+                <label>Liczba gestow:</label>
                 <input
                     id="gestureCountInput"
                     type="number"

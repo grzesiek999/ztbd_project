@@ -35,7 +35,7 @@ export default function DeletePageContent() {
                         setDeleteDeviceGestureByGestureType(false)
                     }}
                     className={deleteUsersByUserId ? activeClass : noActiveClass}
-                >DELETE users by user id</button>
+                >DELETE users</button>
                 <button
                     type={"button"}
                     onClick={() => {
@@ -44,7 +44,7 @@ export default function DeletePageContent() {
                         setDeleteDeviceGestureByGestureType(false)
                     }}
                     className={deleteDeviceByDeviceId ? activeClass : noActiveClass}
-                >DELETE devices by device id</button>
+                >DELETE devices</button>
                 <button
                     type={"button"}
                     onClick={() => {
@@ -53,7 +53,7 @@ export default function DeletePageContent() {
                         setDeleteDeviceGestureByGestureType(true)
                     }}
                     className={deleteDeviceGestureByGestureType ? activeClass : noActiveClass}
-                >DELETE devices gestures by gesture type</button>
+                >DELETE devices gestures</button>
             </div>
             <SampleOrganism path={path} httpMethod={"DELETE"} />
         </div>

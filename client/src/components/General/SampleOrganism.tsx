@@ -71,7 +71,7 @@ export default function SampleOrganism({path, httpMethod}: SampleOrganismProps) 
         <div className={'sample-organism-div'}>
             <form onSubmit={useQuery}>
                 <div className={'sample-organism-input-container'}>
-                    <label>Set samples count:</label>
+                    <label>Podaj liczbe probek:</label>
                     <input
                         id="sampleNumberInput"
                         type="number"
@@ -83,7 +83,7 @@ export default function SampleOrganism({path, httpMethod}: SampleOrganismProps) 
                     />
                 </div>
                 <div className={'sample-organism-input-container'}>
-                    <label>Set rows count:</label>
+                    <label>Podaj liczbe wierszy:</label>
                     <input
                         id="rowsCount"
                         type="number"
@@ -95,7 +95,7 @@ export default function SampleOrganism({path, httpMethod}: SampleOrganismProps) 
                     />
                 </div>
                 <button type={'submit'} onClick={() => {
-                }} className={'data-generator-button'}>Show Results
+                }} className={'data-generator-button'}>Przeprowadz analize
                 </button>
             </form>
             <ResultsOrganism postgreTimes={postgreTimes} mongoTimes={mongoTimes}/>
