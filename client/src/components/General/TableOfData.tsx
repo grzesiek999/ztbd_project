@@ -8,7 +8,7 @@ type TableOfDataProps = {
 const TableOfData = ({title, timesArray}: TableOfDataProps) => {
     const labels = Array.from(
         { length: timesArray.length },
-        (_, index) => `Sample ${index + 1}`
+        (_, index) => `Probka ${index + 1}`
     );
 
     return (
