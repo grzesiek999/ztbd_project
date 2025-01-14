@@ -2,12 +2,12 @@ from fastapi import APIRouter, Depends
 from pymongo.database import Database
 from sqlalchemy.orm import Session
 
-import userSchemas
 from core.mongo.database import get_db as get_mongo_db
 from core.postgresql import database as get_postgresql_db
 
 from schemas.test import SamplesCount, SamplesAndRowsCount, ExecutionTime
-from schemas.postgresql import utils
+from schemas.postgresql import userSchemas, utils
+from models.postgresql import userModel
 from schemas.mongo.device_gesture import DeviceGestureDeletePattern
 
 from routers.test import utils as test_utils
@@ -25,6 +25,11 @@ router = APIRouter()
 @router.delete("/user", response_model=ExecutionTime)
 def delete_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
                  postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return delete_users_func(request, mongo_db, postgresql_db)
+
+
+def delete_users_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                      postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -37,21 +42,27 @@ def delete_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
     for i in range(samples_count):
+        drop_and_import_data(postgresql_db)
+
         mongo_time = mongo_delete_users(mongo_db, mongo_users_id)
         mongo_times.append(mongo_time)
         postgres_time = deleteUsersTest(postgres_users_id, postgresql_db)
         postgres_times.append(postgres_time)
-
-        drop_and_import_data(postgresql_db)
+        # drop_and_import_data(postgresql_db)
 
     return ExecutionTime(postgres_execution_times=postgres_times, mongo_execution_times=mongo_times)
 
 
 @router.delete("/device", response_model=ExecutionTime)
 def delete_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
-                 postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+                   postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return delete_devices_func(request, mongo_db, postgresql_db)
+
+
+def delete_devices_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                        postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -64,14 +75,14 @@ def delete_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
     for i in range(samples_count):
+        drop_and_import_data(postgresql_db)
+
         mongo_time = mongo_delete_devices(mongo_db, mongo_devices_id)
         mongo_times.append(mongo_time)
         postgres_time = deleteDevicesTest(postgres_devices_id, postgresql_db)
         postgres_times.append(postgres_time)
-
-        drop_and_import_data(postgresql_db)
 
     return ExecutionTime(postgres_execution_times=postgres_times, mongo_execution_times=mongo_times)
 
@@ -92,15 +103,13 @@ def delete_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mong
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
     for i in range(samples_count):
+        drop_and_import_data(postgresql_db)
+
         mongo_time = mongo_delete_gestures(mongo_db, mongo_gesture)
         mongo_times.append(mongo_time)
         postgres_time = deleteGestureTest(postgres_gesture, postgresql_db)
         postgres_times.append(postgres_time)
 
-        drop_and_import_data(postgresql_db)
-
     return ExecutionTime(postgres_execution_times=postgres_times, mongo_execution_times=mongo_times)
-
-

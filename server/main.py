@@ -15,6 +15,10 @@ from routers.test import select as test_select_router
 from routers.test import insert as test_insert_router
 from routers.test import update as test_update_router
 from routers.test import delete as test_delete_router
+from routers.test.plots.select import router as plot_router_select
+from routers.test.plots.insert import router as plot_router_insert
+from routers.test.plots.update import router as plot_router_update
+from routers.test.plots.delete import router as plot_router_delete
 from core.mongo.database import connect_to_mongo, close_mongo_connection
 from core.postgresql.database import connect_to_postgres, close_postgres_connection
 
@@ -74,6 +78,11 @@ app.include_router(test_select_router.router, prefix="/test/select", tags=["Test
 app.include_router(test_insert_router.router, prefix="/test/insert", tags=["Test INSERT"])
 app.include_router(test_update_router.router, prefix="/test/update", tags=["Test UPDATE"])
 app.include_router(test_delete_router.router, prefix="/test/delete", tags=["Test DELETE"])
+
+app.include_router(plot_router_select, prefix="/plot/select", tags=["Plot select"])
+app.include_router(plot_router_insert, prefix="/plot/insert", tags=["Plot insert"])
+app.include_router(plot_router_update, prefix="/plot/update", tags=["Plot update"])
+app.include_router(plot_router_delete, prefix="/plot/delete", tags=["Plot delete"])
 
 
 if __name__ == "__main__":

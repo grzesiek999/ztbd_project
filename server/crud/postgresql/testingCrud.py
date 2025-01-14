@@ -19,10 +19,13 @@ def selectUsersTest(request: utils.IdListRequest, db: Session = Depends(database
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    batch_size = 65000
     start = time.time()
 
     try:
-        db.query(userModel.User).filter(userModel.User.user_id.in_(id_list)).all()
+        for i in range(0, len(id_list), batch_size):
+            chunk = id_list[i:i + batch_size]
+            chunk_results = db.query(userModel.User).filter(userModel.User.user_id.in_(chunk)).all()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to find user: {str(e)}")
 
@@ -98,10 +101,13 @@ def deleteUsersTest(request: utils.IdListRequest, db: Session = Depends(database
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    batch_size = 65000
     start = time.time()
 
     try:
-        db.query(userModel.User).filter(userModel.User.user_id.in_(id_list)).delete(synchronize_session=False)
+        for i in range(0, len(id_list), batch_size):
+            chunk = id_list[i:i + batch_size]
+            db.query(userModel.User).filter(userModel.User.user_id.in_(chunk)).delete(synchronize_session=False)
         db.commit()
     except Exception as e:
         db.rollback()
@@ -121,10 +127,15 @@ def selectDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    batch_size = 65000
     start = time.time()
 
     try:
-        db.query(deviceModel.Device).options(joinedload(deviceModel.Device.device_gestures)).filter(deviceModel.Device.user_id.in_(id_list)).all()
+        for i in range(0, len(id_list), batch_size):
+            chunk = id_list[i:i + batch_size]
+            chunk_results = db.query(deviceModel.Device).options(joinedload(deviceModel.Device.device_gestures)).filter(
+                deviceModel.Device.user_id.in_(chunk)
+            ).all()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Failed to find device: {str(e)}")
 
@@ -200,10 +211,13 @@ def deleteDevicesTest(request: utils.IdListRequest, db: Session = Depends(databa
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    batch_size = 65000  # Adjust batch size as necessary to avoid hitting the parameter limit
     start = time.time()
 
     try:
-        db.query(deviceModel.Device).filter(deviceModel.Device.device_id.in_(id_list)).delete(synchronize_session=False)
+        for i in range(0, len(id_list), batch_size):
+            chunk = id_list[i:i + batch_size]
+            db.query(deviceModel.Device).filter(deviceModel.Device.device_id.in_(chunk)).delete(synchronize_session=False)
         db.commit()
     except Exception as e:
         db.rollback()
@@ -223,21 +237,28 @@ def selectDeviceGesturesTest(request: utils.IdListRequest, db: Session = Depends
     if not id_list:
         raise HTTPException(status_code=400, detail="The id_list cannot be empty.")
 
+    batch_size = 65000  # Adjust batch size as necessary to avoid hitting the parameter limit
+    results = []
+
     start = time.time()
 
     try:
-        db.query(
-            deviceGestureModel.DeviceGesture.device_gesture_id,
-            deviceGestureModel.DeviceGesture.device_id,
-            deviceGestureModel.DeviceGesture.gesture_name,
-            gestureModel.Gesture.gesture_id,
-            gestureModel.Gesture.gesture_type,
-            gestureModel.Gesture.description
-        ).join(
-            gestureModel.Gesture, deviceGestureModel.DeviceGesture.gesture_id == gestureModel.Gesture.gesture_id
-        ).filter(
-            deviceGestureModel.DeviceGesture.device_id.in_(id_list)
-        ).all()
+        # Process the id_list in chunks
+        for i in range(0, len(id_list), batch_size):
+            chunk = id_list[i:i + batch_size]
+            chunk_results = db.query(
+                deviceGestureModel.DeviceGesture.device_gesture_id,
+                deviceGestureModel.DeviceGesture.device_id,
+                deviceGestureModel.DeviceGesture.gesture_name,
+                gestureModel.Gesture.gesture_id,
+                gestureModel.Gesture.gesture_type,
+                gestureModel.Gesture.description
+            ).join(
+                gestureModel.Gesture, deviceGestureModel.DeviceGesture.gesture_id == gestureModel.Gesture.gesture_id
+            ).filter(
+                deviceGestureModel.DeviceGesture.device_id.in_(chunk)
+            ).all()
+            # results.extend(chunk_results)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch device gestures: {str(e)}")
 

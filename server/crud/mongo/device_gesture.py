@@ -1,4 +1,5 @@
 from bson import ObjectId
+from fastapi import HTTPException
 from pymongo.database import Database
 from typing import List
 
@@ -11,20 +12,27 @@ import time
 # TODO: Check if working
 def find_gestures_by_device_ids(db: Database, device_ids: List[str]):
     start = time.time()
-    gestures = db.devices.aggregate([
-        {"$match": {"_id": {"$in": [ObjectId(device_id) for device_id in device_ids]}}},
-        {"$unwind": "$device_gestures"},
-        {"$project": {
-            "_id": 0,
-            "device_id": "$_id",
-            "gesture_id": "$device_gestures.gesture_id",
-            "gesture_type": "$device_gestures.gesture_type",
-            "gesture_name": "$device_gestures.gesture_name",
-            "gesture_description": "$device_gestures.gesture_description"
-        }}
-    ], comment="backend_query")
 
-    gestures_list = list(gestures)  # Convert cursor to list to measure the time accurately
+    batch_size = 250000
+    try:
+        # Podział device_ids na partie
+        for i in range(0, len(device_ids), batch_size):
+            chunk = device_ids[i:i + batch_size]
+            gestures = list(db.devices.aggregate([
+                {"$match": {"_id": {"$in": [ObjectId(device_id) for device_id in chunk]}}},
+                {"$unwind": "$device_gestures"},
+                {"$project": {
+                    "_id": 0,
+                    "device_id": "$_id",
+                    "gesture_id": "$device_gestures.gesture_id",
+                    "gesture_type": "$device_gestures.gesture_type",
+                    "gesture_name": "$device_gestures.gesture_name",
+                    "gesture_description": "$device_gestures.gesture_description"
+                }}
+            ], comment="backend_query"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch gestures: {str(e)}")
+
     end = time.time()
     query_time = (end - start) * 1000
 

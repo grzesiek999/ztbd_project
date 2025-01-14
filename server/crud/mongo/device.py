@@ -3,6 +3,7 @@ from os import device_encoding
 from bson import ObjectId
 from pymongo import UpdateOne
 from pymongo.database import Database
+from pymongo.errors import PyMongoError
 
 from crud.mongo.profiler import get_last_query_time
 from schemas.mongo.device import DeviceCreate, DeviceUpdate
@@ -58,9 +59,19 @@ def update_devices(db: Database, devices_update_data: List[DeviceUpdate]) -> flo
 
 
 def delete_devices(db: Database, device_ids: List[str]) -> float:
+    batch_size = 250000
+
     start = time.time()
-    devices = db.devices.delete_many({"_id": {"$in": [ObjectId(device_id) for device_id in device_ids]}},
-                           comment="backend_query")
+    try:
+        # Przetwarzanie urządzeń w partiach
+        for i in range(0, len(device_ids), batch_size):
+            chunk = device_ids[i:i + batch_size]
+            result = db.devices.delete_many(
+                {"_id": {"$in": [ObjectId(device_id) for device_id in chunk]}},
+                comment="backend_query"
+            )
+    except PyMongoError as e:
+        raise RuntimeError(f"Failed to delete devices: {str(e)}")
     end = time.time()
     query_time = (end - start) * 1000
     return query_time

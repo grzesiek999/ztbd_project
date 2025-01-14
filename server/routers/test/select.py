@@ -4,8 +4,10 @@ from sqlalchemy.orm import Session
 
 from core.mongo.database import get_db as get_mongo_db
 from core.postgresql import database as get_postgresql_db
+from routers.db_data import drop_and_import_data
 from schemas.test import SamplesAndRowsCount, ExecutionTime
 from schemas.postgresql import userSchemas, utils
+from models.postgresql import userModel
 from routers.test import utils as test_utils
 
 from crud.mongo.user import find_users as mongo_find_users
@@ -20,6 +22,11 @@ router = APIRouter()
 @router.post("/user", response_model=ExecutionTime)
 def select_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
                  postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return select_users_func(request, mongo_db, postgresql_db)
+
+
+def select_users_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                      postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -32,7 +39,8 @@ def select_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
+    drop_and_import_data(postgresql_db)
     for i in range(samples_count):
         mongo_time = mongo_find_users(mongo_db, mongo_users_id)
         mongo_times.append(mongo_time)
@@ -44,7 +52,12 @@ def select_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
 
 @router.post("/device", response_model=ExecutionTime)
 def select_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
-                 postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+                   postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return select_devices_func(request, mongo_db, postgresql_db)
+
+
+def select_devices_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                        postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -57,7 +70,8 @@ def select_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
+    drop_and_import_data(postgresql_db)
     for i in range(samples_count):
         mongo_time = mongo_find_devices(mongo_db, mongo_users_id)
         mongo_times.append(mongo_time)
@@ -69,7 +83,12 @@ def select_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
 
 @router.post("/device_gestures", response_model=ExecutionTime)
 def select_device_gestures(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
-                 postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+                           postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return select_device_gestures_func(request, mongo_db, postgresql_db)
+
+
+def select_device_gestures_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                                postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -82,7 +101,8 @@ def select_device_gestures(request: SamplesAndRowsCount, mongo_db: Database = De
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
+    drop_and_import_data(postgresql_db)
     for i in range(samples_count):
         mongo_time = mongo_find_device_gestures(mongo_db, mongo_devices_id)
         mongo_times.append(mongo_time)

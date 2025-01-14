@@ -13,3 +13,6 @@ greenlet
 paramiko
 pandas
 tqdm
+matplotlib
+seaborn
+requests

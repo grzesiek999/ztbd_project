@@ -13,4 +13,4 @@ class SamplesAndRowsCount(SamplesCount):
 
 class ExecutionTime(BaseModel):
     postgres_execution_times: List[float] = Field(..., examples=[13.45, 10.10])
-    mongo_execution_times: List[float] = Field(..., examples=[15.12,8.56])
+    mongo_execution_times: List[float] = Field(..., examples=[15.12, 8.56])

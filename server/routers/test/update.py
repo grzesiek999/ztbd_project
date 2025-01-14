@@ -7,6 +7,7 @@ from core.postgresql import database as get_postgresql_db
 
 from schemas.test import SamplesCount, SamplesAndRowsCount, ExecutionTime
 from schemas.postgresql import userSchemas, deviceSchemas, gestureSchemas
+from models.postgresql import userModel
 from schemas.mongo.user import UserUpdate as MongoUserUpdate
 from schemas.mongo.device import DeviceUpdate as MongoDeviceUpdate
 from schemas.mongo.device_gesture import DeviceGestureUpdate
@@ -26,6 +27,11 @@ router = APIRouter()
 @router.put("/user", response_model=ExecutionTime)
 def update_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
                  postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return update_users_func(request, mongo_db, postgresql_db)
+
+
+def update_users_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                      postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -51,14 +57,14 @@ def update_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
     for i in range(samples_count):
+        drop_and_import_data(postgresql_db)
+
         mongo_time = mongo_update_users(mongo_db, mongo_users)
         mongo_times.append(mongo_time)
         postgres_time = updateUsersTest(postgres_users, postgresql_db)
         postgres_times.append(postgres_time)
-
-        drop_and_import_data(postgresql_db)
 
     return ExecutionTime(postgres_execution_times=postgres_times, mongo_execution_times=mongo_times)
 
@@ -66,6 +72,11 @@ def update_users(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_
 @router.put("/device", response_model=ExecutionTime)
 def update_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
                    postgresql_db: Session = Depends(get_postgresql_db.get_db)):
+    return update_devices_func(request, mongo_db, postgresql_db)
+
+
+def update_devices_func(request: SamplesAndRowsCount, mongo_db: Database = Depends(get_mongo_db),
+                        postgresql_db: Session = Depends(get_postgresql_db.get_db)):
     samples_count = request.samples_count
     rows_count = request.rows_count
 
@@ -98,14 +109,14 @@ def update_devices(request: SamplesAndRowsCount, mongo_db: Database = Depends(ge
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
     for i in range(samples_count):
+        drop_and_import_data(postgresql_db)
+
         mongo_time = mongo_update_devices(mongo_db, mongo_devices)
         mongo_times.append(mongo_time)
         postgres_time = updateDevicesTest(postgres_devices, postgresql_db)
         postgres_times.append(postgres_time)
-
-        drop_and_import_data(postgresql_db)
 
     return ExecutionTime(postgres_execution_times=postgres_times, mongo_execution_times=mongo_times)
 
@@ -127,13 +138,13 @@ def update_gestures(request: SamplesCount, mongo_db: Database = Depends(get_mong
 
     # Wake up the database
     v = mongo_db.users.find({}).limit(1)
-    v2 = postgresql_db.query(userSchemas.User).limit(1)
+    v2 = postgresql_db.query(userModel.User).limit(1)
     for i in range(samples_count):
+        drop_and_import_data(postgresql_db)
+
         mongo_time = mongo_update_gestures(mongo_db, mongo_gesture)
         mongo_times.append(mongo_time)
         postgres_time = updateGestureTest(postgres_gesture, postgresql_db)
         postgres_times.append(postgres_time)
-
-        drop_and_import_data(postgresql_db)
 
     return ExecutionTime(postgres_execution_times=postgres_times, mongo_execution_times=mongo_times)
