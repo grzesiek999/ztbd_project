@@ -1,5 +1,7 @@
 # ztbd_project
 
+Teamwork project for a studiet subject Advanced database technologies 
+
 ## 1) Setup
 ### MongoDB
 1. Run docker-compose up
