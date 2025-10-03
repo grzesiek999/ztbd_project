@@ -1,7 +1,6 @@
 # ztbd_project
 
-Teamwork project for a studiet subject Advanced database technologies 
-
+Teamwork project for a studies subject Advanced Database Technologies which goal is compare queries times in PostgreSQL vs MongoDB.
 ## 1) Setup
 ### MongoDB
 1. Run docker-compose up
